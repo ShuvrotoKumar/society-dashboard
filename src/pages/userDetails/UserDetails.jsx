@@ -7,12 +7,18 @@ import Swal from 'sweetalert2';
 function UserDetails() {
   const navigate = useNavigate();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [roleFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleViewCancel = () => {
     setIsViewModalOpen(false);
     setSelectedUser(null);
+  };
+
+  const showViewModal = (user) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
   };
   const dataSource = [
     {
