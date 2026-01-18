@@ -126,7 +126,7 @@ export default function Notifications() {
                     <Button
                       size="small"
                       type="primary"
-                      style={{ background: "[#C9A961]" }}
+                      className="bg-[#C9A961] hover:bg-[#B09555] border-[#C9A961]"
                       onClick={() => markRead(item.id, true)}
                     >
                       Mark read
