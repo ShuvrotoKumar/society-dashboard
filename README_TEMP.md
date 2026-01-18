@@ -2,7 +2,7 @@
 
 A modern, responsive web dashboard built with React 18, Vite, and Tailwind CSS for managing service provider operations, user management, and administrative tasks.
 
-## íº€ Features
+## ğŸš€ Features
 
 ### Core Functionality
 - **Authentication System**: Secure login, password reset, and email verification
@@ -22,7 +22,7 @@ A modern, responsive web dashboard built with React 18, Vite, and Tailwind CSS f
 - **Data Visualization**: Recharts for analytics and reporting
 - **Route Protection**: Secure navigation with React Router
 
-## í» ï¸ Tech Stack
+## ğŸ› ï¸ Tech Stack
 
 ### Frontend
 - **React 18.3.1** - UI library with hooks and concurrent features
@@ -45,7 +45,7 @@ A modern, responsive web dashboard built with React 18, Vite, and Tailwind CSS f
 - **PostCSS** - CSS processing
 - **Autoprefixer** - CSS vendor prefixing
 
-## í³ Project Structure
+## ğŸ“ Project Structure
 
 ```
 society8807/
@@ -82,7 +82,7 @@ society8807/
 â””â”€â”€ vercel.json          # Vercel deployment config
 ```
 
-## íº€ Getting Started
+## ğŸš€ Getting Started
 
 ### Prerequisites
 - Node.js (v16 or higher)
@@ -116,7 +116,7 @@ society8807/
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint for code quality
 
-## í³± Pages & Routes
+## ğŸ“± Pages & Routes
 
 ### Authentication
 - `/sign-in` - User login
@@ -148,7 +148,7 @@ society8807/
 - `/terms-and-condition` - Terms and conditions
 - `/about-us` - About page
 
-## í¾¨ UI Components
+## ğŸ¨ UI Components
 
 ### Layout Structure
 - **MainLayout**: Main application layout with sidebar and header
@@ -162,7 +162,7 @@ society8807/
 - **Loading States**: Skeleton loaders and spinners
 - **Error Handling**: User-friendly error messages
 
-## í´§ Configuration
+## ğŸ”§ Configuration
 
 ### Vite Configuration
 - React plugin for fast refresh
@@ -179,7 +179,7 @@ society8807/
 - Modern JavaScript standards
 - Consistent code formatting
 
-## íº€ Deployment
+## ğŸš€ Deployment
 
 ### Vercel (Recommended)
 1. Connect your repository to Vercel
@@ -195,7 +195,7 @@ society8807/
    ```
 2. Deploy the `dist` folder to your hosting provider
 
-## í´ Contributing
+## ğŸ¤ Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
@@ -203,11 +203,11 @@ society8807/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## í³ License
+## ğŸ“ License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## í¶˜ Support
+## ğŸ†˜ Support
 
 For support and questions:
 - Create an issue in the repository
