@@ -20,7 +20,7 @@ import Categories from "../pages/Categories/Categories";
 import Earnings from "../pages/Earnings/Earnings";
 import Notifications from "../pages/Notifications/Notifications";
 import Subscriptions from "../pages/subscriptions/Subscriptions";
-import Chat from "../pages/chat/Chat";
+import Chat from "../pages/Chat/Chat";
 import Blogs from "../pages/Blogs/Blogs";
 
 const router = createBrowserRouter([

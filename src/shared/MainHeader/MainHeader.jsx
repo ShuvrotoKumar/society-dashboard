@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMenu, IoNotificationsOutline, IoClose } from "react-icons/io5";
-import Chat from "../../pages/chat/Chat";
+import Chat from "../../pages/Chat/Chat";
 
 const MainHeader = ({ toggleSidebar }) => {
   const navigate = useNavigate();
