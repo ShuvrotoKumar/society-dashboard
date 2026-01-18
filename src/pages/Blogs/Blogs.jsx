@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { ConfigProvider, Modal, Table, Select, Input, Button } from "antd";
 import { IoSearch, IoChevronBack, IoAddOutline } from "react-icons/io5";
 import { FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
@@ -448,7 +448,7 @@ const Blogs = () => {
                 <button
                   onClick={() => setIsViewModalOpen(false)}
                   className="font-semibold px-8 py-2 rounded-lg transition-colors"
-                  style={{ backgroundColor: '#C9A961', color: 'white' }}
+                  style={{ backgroundColor: "#C9A961", color: "white" }}
                 >
                   Close
                 </button>
@@ -470,7 +470,7 @@ const Blogs = () => {
               key="save" 
               type="primary" 
               onClick={handleSaveEdit}
-              style={{ backgroundColor: '#C9A961', borderColor: '#C9A961' }}
+              style={{ backgroundColor: "#C9A961", borderColor: "#C9A961" }}
             >
               Save Changes
             </Button>
@@ -535,7 +535,7 @@ const Blogs = () => {
               key="save" 
               type="primary" 
               onClick={handleSaveNew}
-              style={{ backgroundColor: '#C9A961', borderColor: '#C9A961' }}
+              style={{ backgroundColor: "#C9A961", borderColor: "#C9A961" }}
             >
               Add Blog
             </Button>

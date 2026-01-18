@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FiSearch, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiPlus, FiX } from 'react-icons/fi';
 import { Modal, Button, Input, Select } from 'antd';
 

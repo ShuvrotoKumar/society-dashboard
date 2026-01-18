@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { RiSendPlane2Fill } from "react-icons/ri";
-import { FiMenu, FiMoreVertical, FiMessageSquare } from "react-icons/fi";
+import { FiMenu, FiMoreVertical } from "react-icons/fi";
 import { IoImagesOutline } from "react-icons/io5";
 import { BsCheck2All } from "react-icons/bs";
 
@@ -82,16 +82,6 @@ const users = [
 
 const Chat = () => {
   const [selectedUser, setSelectedUser] = useState(users[0]);
-  const [isMobileView, setIsMobileView] = useState(window.innerWidth < 1024);
-  
-  useLayoutEffect(() => {
-    const handleResize = () => {
-      setIsMobileView(window.innerWidth < 1024);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
   const [messages, setMessages] = useState([
     {
       id: 1,

@@ -1,7 +1,4 @@
-import { ConfigProvider, Modal, Table } from "antd";
-import { FaRegEye } from "react-icons/fa";
-import { FiEdit2 } from "react-icons/fi";
-import { MdBlock } from "react-icons/md";
+import { ConfigProvider, Table } from "antd";
 
 const RecentUsers = () => {
   const dataSource = [

@@ -1,4 +1,4 @@
-import { FaChevronDown, FaUsers, FaVideo } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 import { useState } from "react";
 import dayjs from "dayjs";
 import RecentUsers from "./RecentUsers";

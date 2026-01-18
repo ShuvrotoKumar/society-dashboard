@@ -2,18 +2,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { RxDashboard } from "react-icons/rx";
 import { LuUsers } from "react-icons/lu";
-import { TbBrandWechat, TbReport } from "react-icons/tb";
+import { TbReport } from "react-icons/tb";
 import { IoMdSettings } from "react-icons/io";
 import { IoCloseSharp, IoLogOutOutline } from "react-icons/io5";
 import {
   MdAdminPanelSettings,
-  MdLocalHospital,
-  MdOutlineAssignment,
-  MdOutlineInventory2,
 } from "react-icons/md";
-import { RiFlaskLine } from "react-icons/ri";
-import { BsReceipt, BsCurrencyDollar, BsBookmarkCheck, BsGrid1X2, BsTruck, BsBox, BsCreditCard } from "react-icons/bs";
-import { BiCategory } from "react-icons/bi";
+import { BsBookmarkCheck } from "react-icons/bs";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();

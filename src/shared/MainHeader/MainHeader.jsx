@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoMenu, IoNotificationsOutline, IoChatbubbleEllipses, IoClose } from "react-icons/io5";
+import { IoMenu, IoNotificationsOutline, IoClose } from "react-icons/io5";
 import Chat from "../../pages/chat/Chat";
 
 const MainHeader = ({ toggleSidebar }) => {
@@ -27,9 +27,6 @@ const MainHeader = ({ toggleSidebar }) => {
     };
   }, []);
 
-  const toggleChat = () => {
-    setShowChat(!showChat);
-  };
 
   return (
     <div className="relative w-full px-5">

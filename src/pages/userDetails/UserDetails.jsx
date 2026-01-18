@@ -1,29 +1,20 @@
-import { ConfigProvider, Modal, Table, Select } from "antd";
+import { ConfigProvider, Modal, Table } from "antd";
 import { useMemo, useState } from "react";
 import { IoSearch, IoChevronBack, IoAddOutline } from "react-icons/io5";
-import { MdBlock } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import { FiTrash2 } from "react-icons/fi";
-import { FiEdit2 } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+
 function UserDetails() {
   const navigate = useNavigate();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [editUser, setEditUser] = useState(null);
-  const [roleFilter, setRoleFilter] = useState();
+  const [roleFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const showViewModal = (user) => {
-    setSelectedUser(user);
-    setIsViewModalOpen(true);
-  };
   const handleViewCancel = () => {
     setIsViewModalOpen(false);
     setSelectedUser(null);
   };
-  const [dataSource, setDataSource] = useState([
+  const dataSource = [
     {
       key: "1",
       fullName: "John Doe",
@@ -114,7 +105,8 @@ function UserDetails() {
       phone: "+1 987 654 3219",
       joined: "2025-04-12",
     },
-  ]);
+  ];
+
   const columns = [
     {
       title: "No",

@@ -1,12 +1,9 @@
 import { ConfigProvider, Table } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   IoChevronBack,
   IoAddOutline,
-  IoEyeOutline,
-  IoEyeOffOutline,
-  IoCloudUploadOutline,
 } from "react-icons/io5";
 import Swal from 'sweetalert2';
 
@@ -46,17 +43,6 @@ export default function CreateAdmin() {
     password: "",
     confirmPassword: "",
   });
-  const [showPass, setShowPass] = useState({ new: false, confirm: false });
-  const [imagePreview, setImagePreview] = useState("");
-  const fileInputRef = useRef(null);
-
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setImagePreview(url);
-    }
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();

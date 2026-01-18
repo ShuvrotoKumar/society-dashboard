@@ -1,4 +1,4 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import { FaArrowLeftLong } from 'react-icons/fa6';
 import { Link } from 'react-router-dom';
 
@@ -13,5 +13,9 @@ function PageHeading({ title }) {
         </div>
     );
 }
+
+PageHeading.propTypes = {
+  title: PropTypes.string.isRequired,
+};
 
 export default PageHeading;
