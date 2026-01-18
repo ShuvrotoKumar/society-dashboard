@@ -1,6 +1,8 @@
 import { ConfigProvider, Modal, Table } from "antd";
 import { useMemo, useState } from "react";
 import { IoSearch, IoChevronBack, IoAddOutline } from "react-icons/io5";
+import { MdBlock } from "react-icons/md";
+import { FiEdit2 } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 
