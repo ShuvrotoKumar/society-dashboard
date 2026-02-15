@@ -1,14 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { IoChevronBack } from "react-icons/io5";
+import { 
+  useGetAboutQuery, 
+  useCreateAboutMutation, 
+  useUpdateAboutMutation 
+} from "../../redux/api/aboutApi";
 
 function AboutUs() {
-  const [content, setContent] = useState(
-    "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum."
-  );
+  const [content, setContent] = useState("");
   const navigate = useNavigate();
+  
+  const { data: aboutData, isLoading, error, isError } = useGetAboutQuery();
+  const [updateAbout, { isLoading: isUpdating }] = useUpdateAboutMutation();
+  const [createAbout, { isLoading: isCreating }] = useCreateAboutMutation();
+
+  useEffect(() => {
+    if (aboutData?.data?.content) {
+      setContent(aboutData.data.content);
+    }
+  }, [aboutData]);
+
+  const handleSave = async () => {
+    try {
+      if (isError && error?.status === 404) {
+        // Create new about us if it doesn't exist
+        await createAbout({
+          requestData: { content }
+        }).unwrap();
+        console.log("About us created successfully");
+      } else {
+        // Update existing about us
+        await updateAbout({
+          requestData: { content }
+        }).unwrap();
+        console.log("About us updated successfully");
+      }
+    } catch (error) {
+      console.error("Failed to save about us:", error);
+    }
+  };
 
   return (
     <div className="p-5">
@@ -24,6 +57,20 @@ function AboutUs() {
       </div>
 
       <div className=" bg-white rounded shadow p-5 h-full">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">Loading about us...</div>
+          </div>
+        ) : isError && error?.status === 404 ? (
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            No about us content found. Create new content below.
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-red-500">Failed to load about us</div>
+          </div>
+        ) : null}
+        
         <ReactQuill
           style={{ padding: "10px" }}
           theme="snow"
@@ -33,10 +80,13 @@ function AboutUs() {
       </div>
       <div className="text-center py-5">
         <button
-          onClick={() => console.log(content)}
-          className="bg-[#C9A961] text-white font-semibold w-full py-2 rounded transition duration-200"
+          onClick={handleSave}
+          disabled={isUpdating || isCreating || isLoading}
+          className="bg-[#C9A961] text-white font-semibold w-full py-2 rounded transition duration-200 disabled:opacity-50"
         >
-          Save changes
+          {isUpdating || isCreating ? "Saving..." : 
+           isError && error?.status === 404 ? "Create About Us" : 
+           "Save changes"}
         </button>
       </div>
     </div>
