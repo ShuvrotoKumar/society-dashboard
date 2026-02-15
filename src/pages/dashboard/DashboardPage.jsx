@@ -23,11 +23,11 @@ function DashboardPage() {
   return (
     <div className="flex flex-col space-y-5 p-4 md:p-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {[
           { value: '200K', label: 'Total User' },
-          { value: '1200', label: 'Venue Listed' },
-          { value: '1200', label: 'Venue Booked' },
+          // { value: '1200', label: 'Venue Listed' },
+          // { value: '1200', label: 'Venue Booked' },
           { value: '$120K', label: 'Total Revenue' }
         ].map((stat, index, array) => (
           <div 
