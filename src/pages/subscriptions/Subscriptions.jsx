@@ -171,7 +171,7 @@ function Subscriptions() {
         >
           <IoChevronBack className="w-6 h-6" />
         </button>
-        <h1 className="text-white text-xl sm:text-2xl font-bold">Subscription Management</h1>
+        <h1 className="text-white text-xl sm:text-2xl font-bold">Appointments</h1>
         
         {/* Mobile search */}
         <div className="relative w-full md:hidden mt-1">
@@ -191,7 +191,7 @@ function Subscriptions() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search subscriptions..."
+              placeholder="Search appointments..."
               className="bg-white text-[#0D0D0D] placeholder-[#111827] pl-10 pr-3 py-2 rounded-md focus:outline-none"
             />
             <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]" />
@@ -209,13 +209,13 @@ function Subscriptions() {
             ]}
           />
           
-          <button
+          {/* <button
             onClick={() => navigate('/add-subscription')}
             className="bg-white text-[#C9A961] hover:bg-gray-100 px-4 py-2 rounded-md flex items-center gap-2 whitespace-nowrap"
           >
             <IoAddOutline className="w-5 h-5" />
             <span>Add Subscription</span>
-          </button>
+          </button> */}
         </div>
       </div>
 

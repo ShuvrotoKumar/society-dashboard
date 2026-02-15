@@ -206,7 +206,7 @@ function UserDetails() {
         >
           <IoChevronBack className="w-6 h-6" />
         </button>
-        <h1 className="text-white text-xl sm:text-2xl font-bold">User Management</h1>
+        <h1 className="text-white text-xl sm:text-2xl font-bold">Team Management</h1>
         {/* Mobile search */}
         <div className="relative w-full md:hidden mt-1">
           <input
@@ -224,7 +224,7 @@ function UserDetails() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search users..."
+              placeholder="Search members..."
               className="bg-white text-[#0D0D0D] placeholder-[#111827] pl-10 pr-3 py-2 rounded-md focus:outline-none"
             />
             <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]" />

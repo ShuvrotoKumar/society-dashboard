@@ -8,7 +8,7 @@ import { IoCloseSharp, IoLogOutOutline } from "react-icons/io5";
 import {
   MdAdminPanelSettings,
 } from "react-icons/md";
-import { BsBookmarkCheck } from "react-icons/bs";
+import { BsBookmarkCheck, BsCreditCard } from "react-icons/bs";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
@@ -69,7 +69,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             }`}
           >
             <LuUsers className="w-5 h-5" />
-            <p className="text-lg font-semibold">All Users</p>
+            <p className="text-lg font-semibold">Team Members</p>
           </li>
         </Link>
 
@@ -87,8 +87,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </li>
         </Link> */}
 
-        {/* Subscriptions */}
-        {/* <Link to="/subscriptions" onClick={handleLinkClick}>
+        {/* Appointments*/}
+        <Link to="/subscriptions" onClick={handleLinkClick}>
           <li
             className={`flex items-center gap-2 mt-2 cursor-pointer transition-all duration-300 ease-in-out ${
               isActive("/subscriptions")
@@ -97,9 +97,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             }`}
           >
             <BsCreditCard className="w-5 h-5" />
-            <p className="text-lg font-semibold">Schedule</p>
+            <p className="text-lg font-semibold">Appointments</p>
           </li>
-        </Link> */}
+        </Link> 
 
         
         {/* Categories */}
