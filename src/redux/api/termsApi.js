@@ -4,14 +4,22 @@ const termsAndConditionsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getTermsAndConditions: builder.query({
       query: () => ({
-        url: "home/get-terms-condition",
+        url: "/legal-docs/terms-conditions",
         method: "GET",
       }),
       providesTags: ["termsAndConditions"],
     }),
+    createTermsAndConditions: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "/legal-docs/terms-conditions",
+        method: "POST",
+        body: requestData,
+      }),
+      invalidatesTags: ["termsAndConditions"],
+    }),
     updateTermsAndConditions: builder.mutation({
       query: ({ requestData }) => ({
-        url: "home/update-terms-condition",
+        url: "/legal-docs/terms-conditions",
         method: "PATCH",
         body: requestData,
       }),
@@ -22,5 +30,6 @@ const termsAndConditionsApi = baseApi.injectEndpoints({
 
 export const {
   useGetTermsAndConditionsQuery,
+  useCreateTermsAndConditionsMutation,
   useUpdateTermsAndConditionsMutation,
 } = termsAndConditionsApi;

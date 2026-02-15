@@ -1,14 +1,47 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { IoChevronBack } from "react-icons/io5";
+import { 
+  useGetTermsAndConditionsQuery, 
+  useCreateTermsAndConditionsMutation, 
+  useUpdateTermsAndConditionsMutation 
+} from "../../redux/api/termsApi";
 
 function TermsCondition() {
-  const [content, setContent] = useState(
-    "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum.There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc. There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum."
-  );
+  const [content, setContent] = useState("");
   const navigate = useNavigate();
+  
+  const { data: termsData, isLoading, error, isError } = useGetTermsAndConditionsQuery();
+  const [updateTermsAndConditions, { isLoading: isUpdating }] = useUpdateTermsAndConditionsMutation();
+  const [createTermsAndConditions, { isLoading: isCreating }] = useCreateTermsAndConditionsMutation();
+
+  useEffect(() => {
+    if (termsData?.data?.content) {
+      setContent(termsData.data.content);
+    }
+  }, [termsData]);
+
+  const handleSave = async () => {
+    try {
+      if (isError && error?.status === 404) {
+        // Create new terms and conditions if they don't exist
+        await createTermsAndConditions({
+          requestData: { content }
+        }).unwrap();
+        console.log("Terms and conditions created successfully");
+      } else {
+        // Update existing terms and conditions
+        await updateTermsAndConditions({
+          requestData: { content }
+        }).unwrap();
+        console.log("Terms and conditions updated successfully");
+      }
+    } catch (error) {
+      console.error("Failed to save terms and conditions:", error);
+    }
+  };
 
   return (
     <div className="px-5 md:px-0 py-5 md:py-10">
@@ -24,6 +57,20 @@ function TermsCondition() {
       </div>
 
       <div className=" bg-white rounded shadow p-5 h-full">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-gray-500">Loading terms and conditions...</div>
+          </div>
+        ) : isError && error?.status === 404 ? (
+          <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 text-yellow-700 rounded">
+            No terms and conditions found. Create new ones below.
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-red-500">Failed to load terms and conditions</div>
+          </div>
+        ) : null}
+        
         <ReactQuill
           style={{ padding: "10px" }}
           theme="snow"
@@ -33,10 +80,13 @@ function TermsCondition() {
       </div>
       <div className="text-center py-5">
         <button
-          onClick={() => console.log(content)}
-          className="bg-[#C9A961] text-white font-semibold w-full py-2 rounded transition duration-200"
+          onClick={handleSave}
+          disabled={isUpdating || isCreating || isLoading}
+          className="bg-[#C9A961] text-white font-semibold w-full py-2 rounded transition duration-200 disabled:opacity-50"
         >
-          Save changes
+          {isUpdating || isCreating ? "Saving..." : 
+           isError && error?.status === 404 ? "Create Terms & Conditions" : 
+           "Save changes"}
         </button>
       </div>
     </div>
