@@ -4,14 +4,22 @@ const privacyApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getPrivacy: builder.query({
       query: () => ({
-        url: "home/get-privacy-policy",
+        url: "/legal-docs/privacy-policy",
         method: "GET",
       }),
       providesTags: ["privacy"],
     }),
+    createPrivacy: builder.mutation({
+      query: ({ requestData }) => ({
+        url: "/legal-docs/privacy-policy",
+        method: "POST",
+        body: requestData,
+      }),
+      invalidatesTags: ["privacy"],
+    }),
     updatePrivacy: builder.mutation({
       query: ({ requestData }) => ({
-        url: "home/update-privacy-policy",
+        url: "/legal-docs/privacy-policy",
         method: "PATCH",
         body: requestData,
       }),
@@ -20,4 +28,4 @@ const privacyApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetPrivacyQuery, useUpdatePrivacyMutation } = privacyApi;
+export const { useGetPrivacyQuery, useCreatePrivacyMutation, useUpdatePrivacyMutation } = privacyApi;
