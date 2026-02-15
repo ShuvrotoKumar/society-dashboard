@@ -1,17 +1,57 @@
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useLogInMutation } from "../../redux/api/authApi";
+import { setUser } from "../../redux/Slice/authSlice";
+import { storeUserInfo, storeUserToken } from "../../services/auth.service";
 
 function SignInPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const [formValues, setFormValues] = useState({ email: "", password: "" });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [logIn, { isLoading }] = useLogInMutation();
 
   const handleCheckboxChange = (event) => {
     if (event.target.checked) {
       setIsChecked(true);
     } else {
       setIsChecked(false);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormValues((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await logIn({
+        email: formValues.email,
+        password: formValues.password,
+      }).unwrap();
+
+      const payload = response?.data ?? response;
+      const accessToken = payload?.accessToken || payload?.token;
+      const user = payload?.user || payload?.data?.user;
+
+      if (accessToken) {
+        storeUserToken({ accessToken });
+      }
+
+      if (user) {
+        storeUserInfo(user);
+      }
+
+      dispatch(setUser({ user: user || null, token: accessToken || null }));
+      navigate("/");
+    } catch (error) {
+      console.error("Login failed:", error);
     }
   };
 
@@ -23,7 +63,7 @@ function SignInPage() {
             <div className="flex justify-center items-center mb-10">
               <img src="/logo.png" alt="" />
             </div>
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="w-full">
                 <label className="text-xl text-[#C9A961] mb-2 font-bold">
                   Email
@@ -33,6 +73,8 @@ function SignInPage() {
                   name="email"
                   placeholder="enter your gmail"
                   className="w-full px-5 py-3 border-2 border-[#C9A961] rounded-md outline-none mt-5 placeholder:text-xl"
+                  value={formValues.email}
+                  onChange={handleInputChange}
                   required
                 />
               </div>
@@ -46,6 +88,8 @@ function SignInPage() {
                     name="password"
                     placeholder="**********"
                     className="w-full border-2 border-[#C9A961] rounded-md outline-none px-5 py-3 mt-5 placeholder:text-xl"
+                    value={formValues.password}
+                    onChange={handleInputChange}
                     required
                   />
                   <button
@@ -128,11 +172,11 @@ function SignInPage() {
               </div>
               <div className="flex justify-center items-center">
                 <button
-                  onClick={() => navigate("/")}
-                  type="button"
+                  type="submit"
                   className="w-1/3 bg-[#C9A961] text-white font-bold py-3 rounded-lg shadow-lg cursor-pointer mt-5"
+                  disabled={isLoading}
                 >
-                  Log In
+                  {isLoading ? "Logging In..." : "Log In"}
                 </button>
               </div>
             </form>
