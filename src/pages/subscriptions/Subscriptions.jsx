@@ -4,6 +4,7 @@ import { IoSearch, IoChevronBack, IoAddOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { FiTrash2, FiEye } from "react-icons/fi";
 import Swal from 'sweetalert2';
+import { useGetAllAppointmentsQuery } from "../../redux/api/appointmentsApi";
 
 function Subscriptions() {
   const navigate = useNavigate();
@@ -12,49 +13,30 @@ function Subscriptions() {
   const [statusFilter, setStatusFilter] = useState();
   const [searchQuery, setSearchQuery] = useState("");
 
-
-  const showViewModal = (subscription) => {
-    setSelectedSubscription(subscription);
-    setIsViewModalOpen(true);
-  };
-
-  const handleViewCancel = () => {
-    setIsViewModalOpen(false);
-    setSelectedSubscription(null);
-  };
-
-  const [dataSource, setDataSource] = useState([
-    {
-      key: "1",
-      name: "Premium Plan",
-      user: "John Doe",
-      status: "Active",
-      price: "$29.99",
-      startDate: "2024-01-12",
-      endDate: "2025-01-12",
-      paymentMethod: "Credit Card",
-    },
-    {
-      key: "2",
-      name: "Basic Plan",
-      user: "Emma Smith",
-      status: "Expired",
-      price: "$9.99",
-      startDate: "2024-02-15",
-      endDate: "2024-05-15",
-      paymentMethod: "PayPal",
-    },
-    {
-      key: "3",
-      name: "Pro Plan",
-      user: "Liam Johnson",
-      status: "Active",
-      price: "$49.99",
-      startDate: "2024-03-20",
-      endDate: "2025-03-20",
-      paymentMethod: "Bank Transfer",
-    },
-  ]);
+  // Fetch appointments data from API
+  const { data: appointmentsData, isLoading, error } = useGetAllAppointmentsQuery();
+  
+  // Transform API data to match table structure
+  const transformedData = useMemo(() => {
+    if (!appointmentsData?.data) return [];
+    
+    return appointmentsData.data.map((appointment, index) => ({
+      key: appointment._id,
+      name: `${appointment.planName} ${appointment.fullName}`,
+      user: appointment.fullName,
+      email: appointment.email,
+      phone: appointment.phone || 'N/A',
+      purpose: appointment.purpose,
+      meetingPreference: appointment.meetingPreference,
+      status: 'Active', // Default status since API doesn't provide one
+      price: 'N/A',
+      startDate: new Date(appointment.appointmentDate).toLocaleDateString(),
+      endDate: new Date(appointment.appointmentDate).toLocaleDateString(),
+      appointmentTime: appointment.appointmentTime,
+      paymentMethod: 'N/A',
+      createdAt: new Date(appointment.createdAt).toLocaleDateString(),
+    }));
+  }, [appointmentsData]);
 
   const columns = [
     {
@@ -77,23 +59,29 @@ function Subscriptions() {
       key: "user" 
     },
     { 
-      title: "Status", 
-      dataIndex: "status", 
-      key: "status",
-      render: (status) => (
-        <span className={`px-2 py-1 rounded-full text-xs ${
-          status === 'Active' ? 'bg-green-100 text-green-800' : 
-          status === 'Expired' ? 'bg-red-100 text-red-800' :
-          'bg-gray-100 text-gray-800'
-        }`}>
-          {status}
-        </span>
-      )
+      title: "Email", 
+      dataIndex: "email", 
+      key: "email" 
     },
     { 
-      title: "Price", 
-      dataIndex: "price", 
-      key: "price" 
+      title: "Phone", 
+      dataIndex: "phone", 
+      key: "phone" 
+    },
+    { 
+      title: "Purpose", 
+      dataIndex: "purpose", 
+      key: "purpose" 
+    },
+    { 
+      title: "Meeting Preference", 
+      dataIndex: "meetingPreference", 
+      key: "meetingPreference" 
+    },
+    { 
+      title: "Time", 
+      dataIndex: "appointmentTime", 
+      key: "appointmentTime" 
     },
     { 
       title: "Start Date", 
@@ -119,17 +107,29 @@ function Subscriptions() {
   ];
 
   const filteredData = useMemo(() => {
+    if (!transformedData.length) return [];
+    
     const q = (searchQuery || "").toLowerCase().trim();
-    return dataSource.filter((r) => {
+    return transformedData.filter((r) => {
       const matchStatus = statusFilter ? r.status === statusFilter : true;
       const matchQuery = q
-        ? [r.name, r.user, r.status, r.price, r.paymentMethod]
+        ? [r.name, r.user, r.email, r.phone, r.purpose, r.meetingPreference]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q))
         : true;
       return matchStatus && matchQuery;
     });
-  }, [dataSource, statusFilter, searchQuery]);
+  }, [transformedData, statusFilter, searchQuery]);
+
+  const showViewModal = (subscription) => {
+    setSelectedSubscription(subscription);
+    setIsViewModalOpen(true);
+  };
+
+  const handleViewCancel = () => {
+    setIsViewModalOpen(false);
+    setSelectedSubscription(null);
+  };
 
   const openCancel = (row) => {
     Swal.fire({
@@ -144,7 +144,7 @@ function Subscriptions() {
       reverseButtons: true
     }).then((result) => {
       if (result.isConfirmed) {
-        setDataSource(dataSource.filter(item => item.key !== row.key));
+        // setDataSource(dataSource.filter(item => item.key !== row.key));
         Swal.fire({
           title: 'Cancelled!',
           text: `Subscription for ${row.user} has been cancelled.`,
@@ -175,7 +175,7 @@ function Subscriptions() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search subscriptions..."
+            placeholder="Search appointments..."
             className="w-full bg-white text-[#0D0D0D] placeholder-gray-500 pl-10 pr-3 py-2 rounded-md focus:outline-none"
           />
           <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
@@ -245,10 +245,11 @@ function Subscriptions() {
           pagination={{ pageSize: 10 }}
           scroll={{ x: "max-content" }}
           rowClassName="hover:bg-gray-50 cursor-pointer"
+          loading={isLoading}
         />
         
         
-        {/* View/Edit Subscription Modal */}
+        {/* View Appointment Modal */}
         <Modal
           open={isViewModalOpen}
           centered
@@ -258,7 +259,7 @@ function Subscriptions() {
         >
           {selectedSubscription && (
             <div className="relative">
-              {/* Header with blue gradient */}
+              {/* Header with gradient */}
               <div className="bg-[#C9A961] p-6 -m-6 mb-6 rounded-t-lg">
                 <h2 className="text-3xl font-bold text-white mb-2">
                   {selectedSubscription.name}
@@ -280,33 +281,51 @@ function Subscriptions() {
               {/* Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
-                  <div className="text-gray-500 text-sm">Plan Name</div>
+                  <div className="text-gray-500 text-sm">Full Name</div>
                   <div className="text-lg font-semibold">
-                    {selectedSubscription.name}
+                    {selectedSubscription.user}
                   </div>
                 </div>
                 <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
-                  <div className="text-gray-500 text-sm">Price</div>
+                  <div className="text-gray-500 text-sm">Email</div>
                   <div className="text-lg font-semibold">
-                    {selectedSubscription.price}
+                    {selectedSubscription.email}
                   </div>
                 </div>
                 <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
-                  <div className="text-gray-500 text-sm">Start Date</div>
+                  <div className="text-gray-500 text-sm">Phone</div>
+                  <div className="text-lg font-semibold">
+                    {selectedSubscription.phone}
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                  <div className="text-gray-500 text-sm">Purpose</div>
+                  <div className="text-lg font-semibold">
+                    {selectedSubscription.purpose}
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                  <div className="text-gray-500 text-sm">Meeting Preference</div>
+                  <div className="text-lg font-semibold">
+                    {selectedSubscription.meetingPreference}
+                  </div>
+                </div>
+                <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
+                  <div className="text-gray-500 text-sm">Appointment Date</div>
                   <div className="text-lg font-semibold">
                     {selectedSubscription.startDate}
                   </div>
                 </div>
                 <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
-                  <div className="text-gray-500 text-sm">End Date</div>
+                  <div className="text-gray-500 text-sm">Appointment Time</div>
                   <div className="text-lg font-semibold">
-                    {selectedSubscription.endDate}
+                    {selectedSubscription.appointmentTime}
                   </div>
                 </div>
                 <div className="bg-white border border-gray-200 p-4 rounded-xl shadow-sm">
-                  <div className="text-gray-500 text-sm">Payment Method</div>
+                  <div className="text-gray-500 text-sm">Created On</div>
                   <div className="text-lg font-semibold">
-                    {selectedSubscription.paymentMethod}
+                    {selectedSubscription.createdAt}
                   </div>
                 </div>
               </div>
