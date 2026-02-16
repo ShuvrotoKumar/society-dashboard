@@ -2,15 +2,17 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { baseApi } from "./api/baseApi";
+import { blogApi } from "./api/blogApi";
 import { authSlice } from "./Slice/authSlice";
 const persistConfig = {
   key: "BAZARYA-app",
   storage,
-  blacklist: ["baseApi"], // Prevent persisting API cache
+  blacklist: ["baseApi", "blogApi"], // Prevent persisting API cache
 };
 
 const rootReducer = combineReducers({
   [baseApi.reducerPath]: baseApi.reducer,
+  [blogApi.reducerPath]: blogApi.reducer,
   auth: authSlice.reducer,
 });
 
@@ -24,7 +26,7 @@ export const store = configureStore({
         // Ignore redux-persist actions
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
-    }).concat(baseApi.middleware),
+    }).concat(baseApi.middleware, blogApi.middleware),
 });
 
 export const persistor = persistStore(store);

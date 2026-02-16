@@ -1,16 +1,23 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { getApiBaseUrl } from "../../config/envConfig";
+import { getBaseUrl } from "../../config/envConfig";
 
-export const categoriesApi = createApi({
-  reducerPath: "categoriesApi",
+export const blogApi = createApi({
+  reducerPath: "blogApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: getApiBaseUrl(),
+    baseUrl: getBaseUrl(),
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.token;
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
-  tagTypes: ["categories"],
+  tagTypes: ["blog"],
     endpoints: (builder) => ({
         get_all_blogs: builder.query({
       query: () => "/blogs",
-      providesTags: ["categories"],
+      providesTags: ["blog"],
     }),
     add_blog: builder.mutation({
       query: (data) => ({
@@ -18,22 +25,22 @@ export const categoriesApi = createApi({
         method: "POST",
         body: data,
       }),
-      invalidatesTags: ["categories"],
+      invalidatesTags: ["blog"],
     }),
     update_blog: builder.mutation({
-      query: ({ categoryId, data }) => ({
-        url: `/blogs/${categoryId}`,
+      query: ({ id, data }) => ({
+        url: `/blogs/${id}`,
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: ["categories"],
+      invalidatesTags: ["blog"],
     }),
     delete_blog: builder.mutation({
-      query: (categoryId) => ({
-        url: `/blogs/${categoryId}`,
+      query: (id) => ({
+        url: `/blogs/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["categories"],
+      invalidatesTags: ["blog"],
     }),
   }),
 });

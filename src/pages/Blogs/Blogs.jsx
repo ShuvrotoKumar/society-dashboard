@@ -4,6 +4,7 @@ import { IoSearch, IoChevronBack, IoAddOutline } from "react-icons/io5";
 import { FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { useGet_all_blogsQuery, useAdd_blogMutation, useUpdate_blogMutation, useDelete_blogMutation } from "../../redux/api/blogApi";
 
 const Blogs = () => {
   const navigate = useNavigate();
@@ -15,86 +16,18 @@ const Blogs = () => {
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
-    author: '',
-    category: '',
-    status: 'Published',
-    content: ''
+    body: '',
+    coverImage: null,
+    status: 'Published'
   });
 
-  const [blogs, setBlogs] = useState([
-    {
-      key: "1",
-      title: "Exploring the Beautiful Landscapes of Ireland",
-      author: "Sarah O'Connor",
-      category: "Travel",
-      status: "Published",
-      views: 1250,
-      likes: 89,
-      comments: 23,
-      publishedDate: "2024-01-15",
-      featuredImage: "https://picsum.photos/seed/ireland1/300/200.jpg"
-    },
-    {
-      key: "2",
-      title: "Traditional Irish Cuisine: A Food Lover's Guide",
-      author: "Michael Murphy",
-      category: "Food",
-      status: "Published",
-      views: 980,
-      likes: 67,
-      comments: 15,
-      publishedDate: "2024-01-20",
-      featuredImage: "https://picsum.photos/seed/irishfood/300/200.jpg"
-    },
-    {
-      key: "3",
-      title: "The History of Dublin Castle",
-      author: "Emma Kelly",
-      category: "History",
-      status: "Draft",
-      views: 0,
-      likes: 0,
-      comments: 0,
-      publishedDate: "2024-02-01",
-      featuredImage: "https://picsum.photos/seed/dublin/300/200.jpg"
-    },
-    {
-      key: "4",
-      title: "Best Pubs in Galway for Live Music",
-      author: "Patrick Walsh",
-      category: "Entertainment",
-      status: "Published",
-      views: 2100,
-      likes: 156,
-      comments: 42,
-      publishedDate: "2024-02-10",
-      featuredImage: "https://picsum.photos/seed/galway/300/200.jpg"
-    },
-    {
-      key: "5",
-      title: "Cliffs of Moher: Visitor's Complete Guide",
-      author: "Ciara Byrne",
-      category: "Travel",
-      status: "Published",
-      views: 3400,
-      likes: 234,
-      comments: 78,
-      publishedDate: "2024-02-15",
-      featuredImage: "https://picsum.photos/seed/cliffs/300/200.jpg"
-    },
-    {
-      key: "6",
-      title: "St. Patrick's Festival 2024 Highlights",
-      author: "Liam O'Brien",
-      category: "Culture",
-      status: "Scheduled",
-      views: 0,
-      likes: 0,
-      comments: 0,
-      publishedDate: "2024-03-17",
-      featuredImage: "https://picsum.photos/seed/stpatrick/300/200.jpg"
-    }
-  ]);
+  // API hooks
+  const { data: blogsData, isLoading, error, refetch } = useGet_all_blogsQuery();
+  const [addBlog] = useAdd_blogMutation();
+  const [updateBlog] = useUpdate_blogMutation();
+  const [deleteBlog] = useDelete_blogMutation();
+  
+  const blogs = blogsData?.data || [];
 
   const columns = [
     {
@@ -110,13 +43,13 @@ const Blogs = () => {
       render: (value, record) => (
         <div className="flex items-center gap-3">
           <img
-            src={record.featuredImage}
+            src={record.coverImage || 'https://picsum.photos/seed/default/300/200.jpg'}
             className="w-12 h-12 object-cover rounded"
             alt="Blog thumbnail"
           />
           <div>
             <span className="font-medium leading-none">{value}</span>
-            <div className="text-xs text-gray-500 mt-1">by {record.author}</div>
+            <div className="text-xs text-gray-500 mt-1">{record.body?.substring(0, 50)}...</div>
           </div>
         </div>
       ),
@@ -127,7 +60,7 @@ const Blogs = () => {
       key: "category",
       render: (category) => (
         <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium">
-          {category}
+          {category || 'General'}
         </span>
       ),
     },
@@ -153,25 +86,16 @@ const Blogs = () => {
       key: "engagement",
       render: (_, record) => (
         <div className="text-sm">
-          <div className="flex items-center gap-1">
-            <span className="text-gray-600">👁</span>
-            <span>{record.views.toLocaleString()}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-gray-600">❤️</span>
-            <span>{record.likes}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-gray-600">💬</span>
-            <span>{record.comments}</span>
-          </div>
+          <div className="text-gray-600">ID: {record._id}</div>
+          <div className="text-gray-600">{record.status || 'Draft'}</div>
         </div>
       ),
     },
     {
       title: "Published Date",
-      dataIndex: "publishedDate",
-      key: "publishedDate",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date) => date ? new Date(date).toLocaleDateString() : 'N/A'
     },
     {
       title: "Actions",
@@ -209,7 +133,7 @@ const Blogs = () => {
     return blogs.filter((blog) => {
       const matchStatus = statusFilter === "all" ? true : blog.status === statusFilter;
       const matchQuery = q
-        ? [blog.title, blog.author, blog.category, blog.status]
+        ? [blog.title, blog.body, blog.category, blog.status]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q))
         : true;
@@ -226,10 +150,9 @@ const Blogs = () => {
     setSelectedBlog(blog);
     setFormData({
       title: blog.title,
-      author: blog.author,
-      category: blog.category,
-      status: blog.status,
-      content: ''
+      body: blog.body,
+      coverImage: blog.coverImage,
+      status: blog.status || 'Draft'
     });
     setIsEditModalOpen(true);
   };
@@ -237,7 +160,7 @@ const Blogs = () => {
   const handleDelete = (blog) => {
     Swal.fire({
       title: 'Delete Blog?',
-      html: `Are you sure you want to delete the blog <strong>${blog.title}</strong>?`,
+      html: `Are you sure you want to delete blog <strong>${blog.title}</strong>?`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#C9A961',
@@ -245,18 +168,22 @@ const Blogs = () => {
       confirmButtonText: 'Delete',
       cancelButtonText: 'Cancel',
       reverseButtons: true
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const updatedBlogs = blogs.filter(b => b.key !== blog.key);
-        setBlogs(updatedBlogs);
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Blog has been deleted successfully.',
-          icon: 'success',
-          confirmButtonColor: '#C9A961',
-          timer: 2000,
-          timerProgressBar: true
-        });
+        try {
+          await deleteBlog(blog._id).unwrap();
+          Swal.fire({
+            title: 'Deleted!',
+            text: 'Blog has been deleted successfully.',
+            icon: 'success',
+            confirmButtonColor: '#C9A961',
+            timer: 2000,
+            timerProgressBar: true
+          });
+          refetch();
+        } catch (error) {
+          Swal.fire('Error!', 'Failed to delete blog', 'error');
+        }
       }
     });
   };
@@ -264,56 +191,55 @@ const Blogs = () => {
   const handleAddNew = () => {
     setFormData({
       title: '',
-      author: '',
-      category: '',
-      status: 'Draft',
-      content: ''
+      body: '',
+      coverImage: null,
+      status: 'Draft'
     });
     setIsAddModalOpen(true);
   };
 
-
-  const handleSaveEdit = () => {
-    const updatedBlogs = blogs.map(blog => 
-      blog.key === selectedBlog.key 
-        ? { ...blog, ...formData }
-        : blog
-    );
-    setBlogs(updatedBlogs);
-    setIsEditModalOpen(false);
-    setSelectedBlog(null);
-    
-    Swal.fire({
-      title: 'Updated!',
-      text: 'Blog has been updated successfully.',
-      icon: 'success',
-      confirmButtonColor: '#C9A961',
-      timer: 2000,
-      timerProgressBar: true
-    });
+  const handleSaveEdit = async () => {
+    try {
+      await updateBlog({ id: selectedBlog._id, ...formData }).unwrap();
+      Swal.fire({
+        title: 'Updated!',
+        text: 'Blog has been updated successfully.',
+        icon: 'success',
+        confirmButtonColor: '#C9A961',
+        timer: 2000,
+        timerProgressBar: true
+      });
+      refetch();
+      setIsEditModalOpen(false);
+      setSelectedBlog(null);
+    } catch (error) {
+      Swal.fire('Error!', 'Failed to update blog', 'error');
+    }
   };
 
-  const handleSaveNew = () => {
-    const newBlog = {
-      key: String(Math.max(0, ...blogs.map(blog => parseInt(blog.key))) + 1),
-      ...formData,
-      views: 0,
-      likes: 0,
-      comments: 0,
-      publishedDate: new Date().toISOString().split('T')[0],
-      featuredImage: `https://picsum.photos/seed/blog${Date.now()}/300/200.jpg`
-    };
-    setBlogs([...blogs, newBlog]);
-    setIsAddModalOpen(false);
-    
-    Swal.fire({
-      title: 'Added!',
-      text: 'New blog has been added successfully.',
-      icon: 'success',
-      confirmButtonColor: '#C9A961',
-      timer: 2000,
-      timerProgressBar: true
-    });
+  const handleSaveNew = async () => {
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('body', formData.body);
+      if (formData.coverImage) {
+        formDataToSend.append('coverImage', formData.coverImage);
+      }
+      
+      await addBlog(formDataToSend).unwrap();
+      Swal.fire({
+        title: 'Added!',
+        text: 'New blog has been added successfully.',
+        icon: 'success',
+        confirmButtonColor: '#C9A961',
+        timer: 2000,
+        timerProgressBar: true
+      });
+      refetch();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      Swal.fire('Error!', 'Failed to add blog', 'error');
+    }
   };
 
   return (
@@ -411,7 +337,7 @@ const Blogs = () => {
             <div className="relative">
               <div className="bg-[#C9A961] p-6 -m-6 mb-6 rounded-t-lg">
                 <img
-                  src={selectedBlog.featuredImage}
+                  src={selectedBlog.coverImage || 'https://picsum.photos/seed/default/300/200.jpg'}
                   alt={selectedBlog.title}
                   className="w-full h-48 object-cover rounded-lg mb-4"
                 />
@@ -419,28 +345,17 @@ const Blogs = () => {
                   {selectedBlog.title}
                 </h2>
                 <div className="flex items-center gap-4 text-white">
-                  <span>by {selectedBlog.author}</span>
-                  <span>•</span>
-                  <span>{selectedBlog.publishedDate}</span>
+                  <span>{new Date(selectedBlog.createdAt).toLocaleDateString()}</span>
                   <span>•</span>
                   <span className="px-2 py-1 bg-white/20 rounded-full text-sm">
-                    {selectedBlog.category}
+                    {selectedBlog.status || 'Draft'}
                   </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#C9A961]">{selectedBlog.views.toLocaleString()}</div>
-                  <div className="text-sm text-gray-600">Views</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#C9A961]">{selectedBlog.likes}</div>
-                  <div className="text-sm text-gray-600">Likes</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#C9A961]">{selectedBlog.comments}</div>
-                  <div className="text-sm text-gray-600">Comments</div>
+              <div className="mb-6">
+                <div className="prose max-w-none">
+                  <p className="text-gray-700">{selectedBlog.body}</p>
                 </div>
               </div>
 
