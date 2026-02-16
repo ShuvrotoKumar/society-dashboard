@@ -6,36 +6,26 @@ import {
   IoAddOutline,
 } from "react-icons/io5";
 import Swal from 'sweetalert2';
+import { useGetAdminQuery } from "../../redux/api/adminApi";
 
 export default function CreateAdmin() {
   const navigate = useNavigate();
 
-  const [dataSource, setDataSource] = useState([
-    {
-      key: "1",
-      no: "1",
-      name: "John Admin",
-      email: "john@tdk.com",
-      password: "********",
-      designation: "Super Admin",
-    },
-    {
-      key: "2",
-      no: "2",
-      name: "Jane Admin",
-      email: "jane@tdk.com",
-      password: "********",
-      designation: "Admin",
-    },
-    {
-      key: "3",
-      no: "3",
-      name: "Sam Manager",
-      email: "sam@tdk.com",
-      password: "********",
-      designation: "Admin",
-    },
-  ]);
+  // Fetch admin data from API
+  const { data: adminData, isLoading, error } = useGetAdminQuery();
+  
+  // Transform API data to match table structure
+  const transformedData = adminData?.data?.map((admin, index) => ({
+    key: admin._id,
+    no: String(index + 1),
+    name: admin.fullname,
+    email: admin.email,
+    password: "********",
+    designation: admin.role === 'admin' ? 'Admin' : 'Super Admin',
+    mobile: admin.mobile || 'N/A',
+    avatar: admin.avatar || '',
+    createdAt: new Date(admin.createdAt).toLocaleDateString(),
+  })) || [];
 
   const [form, setForm] = useState({
     name: "",
@@ -90,9 +80,10 @@ export default function CreateAdmin() {
   };
 
   const columns = [
-    { title: "No", dataIndex: "no", key: "no" },
+    { title: "No", dataIndex: "no", key: "no", width: 70 },
     { title: "Name", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Mobile", dataIndex: "mobile", key: "mobile" },
     { title: "Password", dataIndex: "password", key: "password" },
     { title: "Designation", dataIndex: "designation", key: "designation" },
   ];
@@ -139,10 +130,11 @@ export default function CreateAdmin() {
         }}
       >
         <Table
-          dataSource={dataSource}
+          dataSource={transformedData}
           columns={columns}
           pagination={{ pageSize: 10 }}
           scroll={{ x: "max-content" }}
+          loading={isLoading}
         />
       </ConfigProvider>
     </div>

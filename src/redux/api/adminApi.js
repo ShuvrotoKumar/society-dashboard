@@ -9,22 +9,22 @@ const adminApi = baseApi.injectEndpoints({
       }),
       providesTags: ["admin"],
     }),
-    createAdmin: builder.mutation({
-      query: ({ requestData }) => ({
-        url: "/legal-docs/about-us",
-        method: "POST",
-        body: requestData,
-      }),
-      invalidatesTags: ["about"],
-    }),
-    updateAdmin: builder.mutation({
-      query: ({ requestData }) => ({
-        url: "/legal-docs/about-us",
-        method: "PATCH",
-        body: requestData,
-      }),
-      invalidatesTags: ["about"],
-    }),
+    // createAdmin: builder.mutation({
+    //   query: ({ requestData }) => ({
+    //     url: "/legal-docs/about-us",
+    //     method: "POST",
+    //     body: requestData,
+    //   }),
+    //   invalidatesTags: ["about"],
+    // }),
+    // updateAdmin: builder.mutation({
+    //   query: ({ requestData }) => ({
+    //     url: "/legal-docs/about-us",
+    //     method: "PATCH",
+    //     body: requestData,
+    //   }),
+    //   invalidatesTags: ["about"],
+    // }),
   }),
 });
 
