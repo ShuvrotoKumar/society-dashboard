@@ -1,13 +1,13 @@
 import { ConfigProvider, Modal, Table } from "antd";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   IoChevronBack,
   IoAddOutline,
 } from "react-icons/io5";
 import { FiEye, FiEdit2, FiTrash } from "react-icons/fi";
 import Swal from 'sweetalert2';
-import { useGetAdminQuery } from "../../redux/api/adminApi";
+import { useGetAdminQuery, useUpdateAdminMutation, useDeleteAdminMutation } from "../../redux/api/adminApi";
 
 export default function CreateAdmin() {
   const navigate = useNavigate();
@@ -18,20 +18,27 @@ export default function CreateAdmin() {
   const [editForm, setEditForm] = useState({});
 
   // Fetch admin data from API
-  const { data: adminData, isLoading, error } = useGetAdminQuery();
+  const { data: adminData, isLoading, error, refetch } = useGetAdminQuery();
+  const [updateAdmin] = useUpdateAdminMutation();
+  const [deleteAdmin] = useDeleteAdminMutation();
   
   // Transform API data to match table structure
-  const transformedData = adminData?.data?.map((admin, index) => ({
-    key: admin._id,
-    id: admin._id,
-    no: String(index + 1),
-    name: admin.fullname,
-    email: admin.email,
-    designation: admin.role === 'admin' ? 'Admin' : 'Super Admin',
-    mobile: admin.mobile || 'N/A',
-    avatar: admin.avatar || '',
-    createdAt: new Date(admin.createdAt).toLocaleDateString(),
-  })) || [];
+  const transformedData = adminData?.data?.map((admin, index) => {
+    // Debug: Log the raw admin data
+    console.log('Raw admin data:', admin);
+    
+    return {
+      key: admin._id,
+      id: admin._id,
+      no: String(index + 1),
+      name: admin.fullname,
+      email: admin.email,
+      designation: admin.role === 'admin' ? 'Admin' : 'Super Admin',
+      mobile: admin.mobile || 'N/A',
+      avatar: admin.avatar || admin.profileImage || admin.image || admin.photo || '',
+      createdAt: new Date(admin.createdAt).toLocaleDateString(),
+    };
+  }) || [];
 
   const showViewModal = (admin) => {
     setSelectedAdmin(admin);
@@ -70,16 +77,40 @@ export default function CreateAdmin() {
     setSelectedAdmin(null);
   };
 
-  const handleEditSubmit = () => {
-    // Here you would typically make an API call to update the admin
-    Swal.fire('Success!', 'Admin updated successfully', 'success');
-    handleEditCancel();
+  const handleEditSubmit = async () => {
+    try {
+      const requestData = {
+        id: selectedAdmin.id,
+        fullname: editForm.fullname,
+        email: editForm.email,
+        mobile: editForm.mobile,
+        role: editForm.role
+      };
+      
+      await updateAdmin({ requestData }).unwrap();
+      Swal.fire('Success!', 'Admin updated successfully', 'success');
+      refetch(); // Refresh the data
+      handleEditCancel();
+    } catch (error) {
+      Swal.fire('Error!', 'Failed to update admin', 'error');
+      console.error('Update error:', error);
+    }
   };
 
-  const handleDeleteConfirm = () => {
-    // Here you would typically make an API call to delete the admin
-    Swal.fire('Success!', 'Admin deleted successfully', 'success');
-    handleDeleteCancel();
+  const handleDeleteConfirm = async () => {
+    try {
+      const requestData = {
+        id: selectedAdmin.id
+      };
+      
+      await deleteAdmin({ requestData }).unwrap();
+      Swal.fire('Success!', 'Admin deleted successfully', 'success');
+      refetch(); // Refresh the data
+      handleDeleteCancel();
+    } catch (error) {
+      Swal.fire('Error!', 'Failed to delete admin', 'error');
+      console.error('Delete error:', error);
+    }
   };
 
   const handleEditChange = (field, value) => {
@@ -95,15 +126,42 @@ export default function CreateAdmin() {
       width: 90,
       render: (avatar, record) => {
         const initial = (record?.name || "A").trim().charAt(0).toUpperCase();
-        return avatar ? (
-          <img
-            src={avatar}
-            alt="avatar"
-            className="h-10 w-10 rounded-full object-cover border border-gray-200"
-          />
-        ) : (
-          <div className="h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 font-semibold">
-            {initial}
+        
+        // Debug: Log avatar data
+        console.log('Avatar data for', record.name, ':', avatar);
+        
+        // Check if avatar exists and is a valid URL
+        const hasValidAvatar = avatar && 
+          typeof avatar === 'string' && 
+          avatar.trim() !== '' && 
+          (avatar.startsWith('http') || avatar.startsWith('data:image'));
+        
+        return (
+          <div className="relative">
+            {hasValidAvatar ? (
+              <img
+                src={avatar}
+                alt="avatar"
+                className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                onError={(e) => {
+                  console.log('Image failed to load:', avatar);
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                  if (e.target.nextSibling) {
+                    e.target.nextSibling.style.display = 'flex';
+                  }
+                }}
+                onLoad={() => {
+                  console.log('Image loaded successfully:', avatar);
+                }}
+              />
+            ) : null}
+            <div 
+              className={`h-10 w-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 font-semibold ${hasValidAvatar ? 'hidden' : ''}`}
+              style={{ display: hasValidAvatar ? 'none' : 'flex' }}
+            >
+              {initial}
+            </div>
           </div>
         );
       },
@@ -335,6 +393,7 @@ export default function CreateAdmin() {
           onCancel={handleDeleteCancel}
           footer={null}
           width={500}
+            
         >
           {selectedAdmin && (
             <div className="relative">

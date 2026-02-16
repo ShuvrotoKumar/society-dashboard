@@ -184,7 +184,7 @@ function Subscriptions() {
             <IoSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#111827]" />
           </div>
           
-          <Select
+          {/* <Select
             placeholder="Filter by status"
             allowClear
             onChange={setStatusFilter}
@@ -194,7 +194,7 @@ function Subscriptions() {
               { value: 'Expired', label: 'Expired' },
               { value: 'Cancelled', label: 'Cancelled' },
             ]}
-          />
+          /> */}
           
           {/* <button
             onClick={() => navigate('/add-subscription')}

@@ -40,16 +40,7 @@ const MainHeader = ({ toggleSidebar }) => {
             <IoMenu className="w-8 h-8 text-[#C9A961]" />
           </button>
           <div className="flex items-center gap-3">
-            {/* Notification */}
-            <button
-              type="button"
-              aria-label="Notifications"
-              onClick={() => navigate('/notifications')}
-              className="relative p-2 rounded-full border border-[#C9A961] hover:bg-white/60 transition"
-            >
-              <IoNotificationsOutline className="w-6 h-6 text-[#C9A961]" />
-              <span className="absolute -top-0.5 -right-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[#C9A961] text-white text-[10px] px-1 leading-none">3</span>
-            </button>
+            
 
             {/* Profile */}
             <div

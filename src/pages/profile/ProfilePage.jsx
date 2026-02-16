@@ -42,7 +42,7 @@ function ProfilePage() {
               </div>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-lg sm:text-xl md:text-3xl font-bold">Shah Aman</p>
+              <p className="text-lg sm:text-xl md:text-3xl font-bold">Shanto</p>
               <p className="text-base sm:text-lg font-semibold">Admin</p>
             </div>
           </div>
