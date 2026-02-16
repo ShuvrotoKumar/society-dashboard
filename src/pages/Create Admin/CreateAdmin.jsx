@@ -8,14 +8,29 @@ import {
 import { FiEye, FiEdit2, FiTrash } from "react-icons/fi";
 import Swal from 'sweetalert2';
 import { useGetAdminQuery, useUpdateAdminMutation, useDeleteAdminMutation } from "../../redux/api/adminApi";
+import { useSelector } from 'react-redux';
+import { decodeAuthToken } from '../../Utils/decode-access-token';
 
 export default function CreateAdmin() {
   const navigate = useNavigate();
+  const { user, token } = useSelector((state) => state.auth);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
   const [editForm, setEditForm] = useState({});
+
+  // Debug: Log current user info
+  console.log('Current user:', user);
+  console.log('Current token:', token);
+  console.log('Current user role:', user?.role);
+  
+  // Decode JWT token to check role
+  if (token) {
+    const decodedToken = decodeAuthToken(token);
+    console.log('Decoded JWT token:', decodedToken);
+    console.log('Role from token:', decodedToken?.role);
+  }
 
   // Fetch admin data from API
   const { data: adminData, isLoading, error, refetch } = useGetAdminQuery();
@@ -113,7 +128,22 @@ export default function CreateAdmin() {
         id: selectedAdmin.id
       };
       
+      console.log('Current user role check:', user?.role);
+      console.log('Is super admin?', user?.role === 'super_admin');
+      
+      // Also check token role
+      const decodedToken = token ? decodeAuthToken(token) : null;
+      console.log('Token role check:', decodedToken?.role);
+      console.log('Is super admin from token?', decodedToken?.role === 'super_admin');
+      
       console.log('Sending delete request:', requestData);
+      
+      // Check if current user is super admin before proceeding
+      if (user?.role !== 'super_admin' && decodedToken?.role !== 'super_admin') {
+        Swal.fire('Error!', 'Only super admins can delete admin accounts', 'error');
+        return;
+      }
+      
       const result = await deleteAdmin({ requestData }).unwrap();
       console.log('Delete response:', result);
       
