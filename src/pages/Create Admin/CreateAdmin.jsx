@@ -27,6 +27,13 @@ export default function CreateAdmin() {
     // Debug: Log the raw admin data
     console.log('Raw admin data:', admin);
     
+    // Construct full avatar URL if it's a relative path
+    let avatarUrl = admin.avatar || admin.profileImage || admin.image || admin.photo || '';
+    if (avatarUrl && avatarUrl.startsWith('/')) {
+      // If it's a relative path, construct full URL
+      avatarUrl = `${window.location.origin}${avatarUrl}`;
+    }
+    
     return {
       key: admin._id,
       id: admin._id,
@@ -35,7 +42,7 @@ export default function CreateAdmin() {
       email: admin.email,
       designation: admin.role === 'admin' ? 'Admin' : 'Super Admin',
       mobile: admin.mobile || 'N/A',
-      avatar: admin.avatar || admin.profileImage || admin.image || admin.photo || '',
+      avatar: avatarUrl,
       createdAt: new Date(admin.createdAt).toLocaleDateString(),
     };
   }) || [];
@@ -87,13 +94,16 @@ export default function CreateAdmin() {
         role: editForm.role
       };
       
-      await updateAdmin({ requestData }).unwrap();
+      console.log('Sending update request:', requestData);
+      const result = await updateAdmin({ requestData }).unwrap();
+      console.log('Update response:', result);
+      
       Swal.fire('Success!', 'Admin updated successfully', 'success');
       refetch(); // Refresh the data
       handleEditCancel();
     } catch (error) {
-      Swal.fire('Error!', 'Failed to update admin', 'error');
-      console.error('Update error:', error);
+      console.error('Update error details:', error);
+      Swal.fire('Error!', error.data?.message || 'Failed to update admin', 'error');
     }
   };
 
@@ -103,13 +113,16 @@ export default function CreateAdmin() {
         id: selectedAdmin.id
       };
       
-      await deleteAdmin({ requestData }).unwrap();
+      console.log('Sending delete request:', requestData);
+      const result = await deleteAdmin({ requestData }).unwrap();
+      console.log('Delete response:', result);
+      
       Swal.fire('Success!', 'Admin deleted successfully', 'success');
       refetch(); // Refresh the data
       handleDeleteCancel();
     } catch (error) {
-      Swal.fire('Error!', 'Failed to delete admin', 'error');
-      console.error('Delete error:', error);
+      console.error('Delete error details:', error);
+      Swal.fire('Error!', error.data?.message || 'Failed to delete admin', 'error');
     }
   };
 
@@ -134,7 +147,7 @@ export default function CreateAdmin() {
         const hasValidAvatar = avatar && 
           typeof avatar === 'string' && 
           avatar.trim() !== '' && 
-          (avatar.startsWith('http') || avatar.startsWith('data:image'));
+          (avatar.startsWith('http') || avatar.startsWith('data:image') || avatar.startsWith('/'));
         
         return (
           <div className="relative">
