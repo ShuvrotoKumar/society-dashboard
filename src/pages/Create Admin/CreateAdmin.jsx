@@ -128,23 +128,7 @@ export default function CreateAdmin() {
         id: selectedAdmin.id
       };
       
-      // Also check token role
-      const decodedToken = token ? decodeAuthToken(token) : null;
-      
-      // Check if current user is super admin (case-insensitive)
-      const userRole = (user?.role || '').toLowerCase().replace(/[-_\s]/g, '');
-      const tokenRole = (decodedToken?.role || '').toLowerCase().replace(/[-_\s]/g, '');
-      const isSuperAdmin = userRole === 'superadmin' || tokenRole === 'superadmin';
-      
-      console.log('User role (normalized):', userRole);
-      console.log('Token role (normalized):', tokenRole);
-      console.log('Is super admin?', isSuperAdmin);
-      
-      if (!isSuperAdmin) {
-        Swal.fire('Error!', 'Only super admins can delete admin accounts', 'error');
-        return;
-      }
-      
+      console.log('Sending delete request:', requestData);
       const result = await deleteAdmin({ requestData }).unwrap();
       console.log('Delete response:', result);
       
