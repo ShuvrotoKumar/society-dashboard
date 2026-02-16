@@ -5,9 +5,11 @@ import { MdBlock } from "react-icons/md";
 import { FiEdit2, FiEye, FiTrash } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { useGetTeamUserQuery } from "../../redux/api/userApi";
 
 function UserDetails() {
   const navigate = useNavigate();
+  const { data: teamData, isLoading, error } = useGetTeamUserQuery();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -22,6 +24,22 @@ function UserDetails() {
     phone: '',
     joined: new Date().toISOString().split('T')[0]
   });
+
+  // Transform API data to match table structure
+  const dataSource = useMemo(() => {
+    if (!teamData?.data) return [];
+    return teamData.data.map((user, index) => ({
+      key: user._id,
+      fullName: user.name,
+      role: user.designation || 'N/A',
+      email: user.email,
+      phone: user.phone || 'N/A',
+      joined: new Date(user.createdAt).toLocaleDateString(),
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      keyword: user.keyword,
+    }));
+  }, [teamData]);
 
   const handleViewCancel = () => {
     setIsViewModalOpen(false);
@@ -120,98 +138,6 @@ function UserDetails() {
       }
     });
   };
-  const dataSource = [
-    {
-      key: "1",
-      fullName: "John Doe",
-      role: "User",
-      clinic: "Downtown Dental Clinic",
-      email: "john@example.com",
-      phone: "+1 987 654 3210",
-      joined: "2024-01-12",
-    },
-    {
-      key: "2",
-      fullName: "Emma Smith",
-      role: "Vendor",
-      clinic: "Smile Care Clinic",
-      email: "emma@example.com",
-      phone: "+1 987 654 3211",
-      joined: "2024-03-28",
-    },
-    {
-      key: "3",
-      fullName: "Liam Johnson",
-      role: "User",
-      clinic: "Healthy Teeth Clinic",
-      email: "liam@example.com",
-      phone: "+1 987 654 3212",
-      joined: "2024-06-15",
-    },
-    {
-      key: "4",
-      fullName: "Olivia Brown",
-      role: "Vendor",
-      clinic: "City Dental Center",
-      email: "olivia@example.com",
-      phone: "+1 987 654 3213",
-      joined: "2024-08-02",
-    },
-    {
-      key: "5",
-      fullName: "Noah Davis",
-      role: "User",
-      clinic: "Prime Smiles",
-      email: "noah@example.com",
-      phone: "+1 987 654 3214",
-      joined: "2024-09-10",
-    },
-    {
-      key: "6",
-      fullName: "Sophia Miller",
-      role: "Vendor",
-      clinic: "Bright Smile Hub",
-      email: "sophia@example.com",
-      phone: "+1 987 654 3215",
-      joined: "2024-11-19",
-    },
-    {
-      key: "7",
-      fullName: "James Wilson",
-      role: "User",
-      clinic: "Downtown Dental Clinic",
-      email: "james@example.com",
-      phone: "+1 987 654 3216",
-      joined: "2025-01-05",
-    },
-    {
-      key: "8",
-      fullName: "Isabella Moore",
-      role: "Vendor",
-      clinic: "Healthy Teeth Clinic",
-      email: "isabella@example.com",
-      phone: "+1 987 654 3217",
-      joined: "2025-02-21",
-    },
-    {
-      key: "9",
-      fullName: "Benjamin Taylor",
-      role: "User",
-      clinic: "Prime Smiles",
-      email: "benjamin@example.com",
-      phone: "+1 987 654 3218",
-      joined: "2025-03-03",
-    },
-    {
-      key: "10",
-      fullName: "Mia Anderson",
-      role: "Vendor",
-      clinic: "City Dental Center",
-      email: "mia@example.com",
-      phone: "+1 987 654 3219",
-      joined: "2025-04-12",
-    },
-  ];
 
   const columns = [
     {
@@ -227,7 +153,7 @@ function UserDetails() {
       render: (value, record) => (
         <div className="flex items-center gap-3">
           <img
-            src={`https://avatar.iran.liara.run/public/${record.key}`}
+            src={record.profilePicture || `https://avatar.iran.liara.run/public/${record.key}`}
             className="w-10 h-10 object-cover rounded-full"
             alt="User Avatar"
           />
@@ -381,6 +307,7 @@ function UserDetails() {
           columns={columns}
           pagination={{ pageSize: 10 }}
           scroll={{ x: "max-content" }}
+          loading={isLoading}
         />
         
         {/* View Modal */}
@@ -399,7 +326,7 @@ function UserDetails() {
                 <div className="flex items-center gap-6">
                   <div className="relative">
                     <img
-                      src={`https://avatar.iran.liara.run/public/${selectedUser.key}`}
+                      src={selectedUser.profilePicture || `https://avatar.iran.liara.run/public/${selectedUser.key}`}
                       alt={selectedUser.fullName}
                       className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
                     />

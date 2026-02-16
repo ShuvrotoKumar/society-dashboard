@@ -2,9 +2,9 @@ import { baseApi } from "./baseApi";
 
 export const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getAllUser: builder.query({
+    getTeamUser: builder.query({
       query: (params) => ({
-        url: "dashboard/get-all-user",
+        url: "/team-members",
         method: "GET",
         params: {
           ...params,
@@ -43,7 +43,7 @@ export const userApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetAllUserQuery,
+  useGetTeamUserQuery,
   useGetSingleUserQuery,
   useUpdateUserMutation,
   useDeleteUserMutation,
