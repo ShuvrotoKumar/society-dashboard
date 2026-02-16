@@ -2,8 +2,7 @@ import { ConfigProvider, Modal, Table, Select } from "antd";
 import { useMemo, useState } from "react";
 import { IoSearch, IoChevronBack, IoAddOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
-import { FiTrash2 } from "react-icons/fi";
-import { FiEdit2 } from 'react-icons/fi';
+import { FiTrash2, FiEye } from "react-icons/fi";
 import Swal from 'sweetalert2';
 
 function Subscriptions() {
@@ -111,11 +110,8 @@ function Subscriptions() {
       key: "action",
       render: (_, record) => (
         <div className="flex gap-2">
-          <button className="" onClick={() => openCancel(record)}>
-            <FiTrash2 className="h-5 w-5 text-red-600 cursor-pointer rounded-md" />
-          </button>
           <button className="" onClick={() => showViewModal(record)}>
-            <FiEdit2 className="text-[#C9A961] w-5 h-5 cursor-pointer rounded-md" />
+            <FiEye className="text-blue-600 w-5 h-5 cursor-pointer rounded-md" />
           </button>
         </div>
       ),
@@ -319,18 +315,9 @@ function Subscriptions() {
               <div className="flex justify-end items-center mt-8 pt-6 border-t border-gray-200 gap-3">
                 <button
                   onClick={handleViewCancel}
-                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  className="px-6 py-2 bg-[#C9A961] text-white rounded-lg hover:bg-blue-700"
                 >
                   Close
-                </button>
-                <button
-                  onClick={() => {
-                    // Handle edit functionality
-                    console.log('Edit subscription:', selectedSubscription);
-                  }}
-                  className="bg-[#C9A961] text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-                >
-                  Save Changes
                 </button>
               </div>
             </div>
