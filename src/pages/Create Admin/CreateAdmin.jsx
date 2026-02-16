@@ -12,7 +12,10 @@ import { useGetAdminQuery } from "../../redux/api/adminApi";
 export default function CreateAdmin() {
   const navigate = useNavigate();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   // Fetch admin data from API
   const { data: adminData, isLoading, error } = useGetAdminQuery();
@@ -35,9 +38,52 @@ export default function CreateAdmin() {
     setIsViewModalOpen(true);
   };
 
+  const showEditModal = (admin) => {
+    setSelectedAdmin(admin);
+    setEditForm({
+      fullname: admin.name,
+      email: admin.email,
+      mobile: admin.mobile === 'N/A' ? '' : admin.mobile,
+      role: admin.designation === 'Admin' ? 'admin' : 'super_admin'
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const showDeleteModal = (admin) => {
+    setSelectedAdmin(admin);
+    setIsDeleteModalOpen(true);
+  };
+
   const handleViewCancel = () => {
     setIsViewModalOpen(false);
     setSelectedAdmin(null);
+  };
+
+  const handleEditCancel = () => {
+    setIsEditModalOpen(false);
+    setSelectedAdmin(null);
+    setEditForm({});
+  };
+
+  const handleDeleteCancel = () => {
+    setIsDeleteModalOpen(false);
+    setSelectedAdmin(null);
+  };
+
+  const handleEditSubmit = () => {
+    // Here you would typically make an API call to update the admin
+    Swal.fire('Success!', 'Admin updated successfully', 'success');
+    handleEditCancel();
+  };
+
+  const handleDeleteConfirm = () => {
+    // Here you would typically make an API call to delete the admin
+    Swal.fire('Success!', 'Admin deleted successfully', 'success');
+    handleDeleteCancel();
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditForm(prev => ({ ...prev, [field]: value }));
   };
 
   const columns = [
@@ -75,11 +121,11 @@ export default function CreateAdmin() {
           <button type="button" onClick={() => showViewModal(record)}>
             <FiEye className="text-blue-600 w-5 h-5 cursor-pointer rounded-md" />
           </button>
-          <button type="button" onClick={() => navigate(`/edit-admin/${record.id}`)}>
+          <button type="button" onClick={() => showEditModal(record)}>
             <FiEdit2 className="text-[#C9A961] w-5 h-5 cursor-pointer rounded-md" />
           </button>
-          <button type="button" onClick={() => navigate(`/edit-admin/${record.id}`)}>
-            <FiTrash className="text-[#C9A961] w-5 h-5 cursor-pointer rounded-md" />
+          <button type="button" onClick={() => showDeleteModal(record)}>
+            <FiTrash className="text-red-600 w-5 h-5 cursor-pointer rounded-md" />
           </button>
         </div>
       ),
@@ -199,6 +245,142 @@ export default function CreateAdmin() {
                   className="px-6 py-2 bg-[#C9A961] text-white rounded-lg hover:bg-blue-700"
                 >
                   Close
+                </button>
+              </div>
+            </div>
+          )}
+        </Modal>
+
+        <Modal
+          open={isEditModalOpen}
+          centered
+          onCancel={handleEditCancel}
+          footer={null}
+          width={600}
+        >
+          {selectedAdmin && (
+            <div className="relative">
+              <div className="bg-[#C9A961] p-6 -m-6 mb-6 rounded-t-lg">
+                <h2 className="text-3xl font-bold text-white mb-2">Edit Admin</h2>
+                <div className="flex items-center gap-3">
+                  <span className="text-white/90">{selectedAdmin.name}</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={editForm.fullname || ''}
+                    onChange={(e) => handleEditChange('fullname', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A961]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={editForm.email || ''}
+                    onChange={(e) => handleEditChange('email', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A961]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Mobile</label>
+                  <input
+                    type="text"
+                    value={editForm.mobile || ''}
+                    onChange={(e) => handleEditChange('mobile', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A961]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                  <select
+                    value={editForm.role || 'admin'}
+                    onChange={(e) => handleEditChange('role', e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A961]"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="super_admin">Super Admin</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end items-center mt-8 pt-6 border-t border-gray-200 gap-3">
+                <button
+                  onClick={handleEditCancel}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditSubmit}
+                  className="px-6 py-2 bg-[#C9A961] text-white rounded-lg hover:bg-blue-700"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          )}
+        </Modal>
+
+        <Modal
+          open={isDeleteModalOpen}
+          centered
+          onCancel={handleDeleteCancel}
+          footer={null}
+          width={500}
+        >
+          {selectedAdmin && (
+            <div className="relative">
+              <div className="bg-red-600 p-6 -m-6 mb-6 rounded-t-lg">
+                <h2 className="text-3xl font-bold text-white mb-2">Delete Admin</h2>
+                <div className="flex items-center gap-3">
+                  <span className="text-white/90">Confirm Deletion</span>
+                </div>
+              </div>
+
+              <div className="text-center py-6">
+                <div className="mb-6">
+                  {selectedAdmin.avatar ? (
+                    <img
+                      src={selectedAdmin.avatar}
+                      alt="avatar"
+                      className="h-20 w-20 rounded-full object-cover border border-gray-200 mx-auto"
+                    />
+                  ) : (
+                    <div className="h-20 w-20 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-600 font-semibold mx-auto">
+                      {(selectedAdmin?.name || "A").trim().charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">{selectedAdmin.name}</h3>
+                <p className="text-gray-600 mb-1">{selectedAdmin.email}</p>
+                <p className="text-sm text-gray-500 mb-6">{selectedAdmin.designation}</p>
+                
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <p className="text-red-800 font-medium">Are you sure you want to delete this admin?</p>
+                  <p className="text-red-600 text-sm mt-1">This action cannot be undone.</p>
+                </div>
+              </div>
+
+              <div className="flex justify-end items-center pt-6 border-t border-gray-200 gap-3">
+                <button
+                  onClick={handleDeleteCancel}
+                  className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteConfirm}
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  Delete Admin
                 </button>
               </div>
             </div>

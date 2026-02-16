@@ -17,15 +17,23 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["admin"],
     }),
-    // updateAdmin: builder.mutation({
-    //   query: ({ requestData }) => ({
-    //     url: "/legal-docs/about-us",
-    //     method: "PATCH",
-    //     body: requestData,
-    //   }),
-    //   invalidatesTags: ["about"],
-    // }),
+    updateAdmin: builder.mutation({
+      query: ({ requestData }) => ({
+        url: `/admin/edit-admin/${requestData.id}`,
+        method: "PATCH",
+        body: requestData,
+      }),
+      invalidatesTags: ["admin"],
+    }),
+   deleteAdmin: builder.mutation({
+      query: ({ requestData }) => ({
+        url: `/admin/delete-admin/${requestData.id}`,
+        method: "DELETE",
+        body: requestData,
+      }),
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
-export const { useGetAdminQuery, useCreateAdminMutation } = adminApi;
+export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation } = adminApi;
