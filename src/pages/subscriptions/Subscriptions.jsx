@@ -22,7 +22,6 @@ function Subscriptions() {
     
     return appointmentsData.data.map((appointment, index) => ({
       key: appointment._id,
-      name: `${appointment.planName} ${appointment.fullName}`,
       user: appointment.fullName,
       email: appointment.email,
       phone: appointment.phone || 'N/A',
@@ -44,14 +43,6 @@ function Subscriptions() {
       key: "no",
       width: 70,
       render: (_, _r, index) => index + 1,
-    },
-    {
-      title: "Plan Name",
-      dataIndex: "name",
-      key: "name",
-      render: (value) => (
-        <span className="font-medium">{value}</span>
-      ),
     },
     { 
       title: "User", 
@@ -113,7 +104,7 @@ function Subscriptions() {
     return transformedData.filter((r) => {
       const matchStatus = statusFilter ? r.status === statusFilter : true;
       const matchQuery = q
-        ? [r.name, r.user, r.email, r.phone, r.purpose, r.meetingPreference]
+        ? [r.user, r.email, r.phone, r.purpose, r.meetingPreference]
           .filter(Boolean)
           .some((v) => String(v).toLowerCase().includes(q))
         : true;
@@ -262,7 +253,7 @@ function Subscriptions() {
               {/* Header with gradient */}
               <div className="bg-[#C9A961] p-6 -m-6 mb-6 rounded-t-lg">
                 <h2 className="text-3xl font-bold text-white mb-2">
-                  {selectedSubscription.name}
+                  Appointment Details
                 </h2>
                 <div className="flex items-center gap-3">
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${
