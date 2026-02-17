@@ -160,6 +160,7 @@ function UserDetails() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
+          console.log('Deleting user with key:', user.key);
           await deleteUser(user.key).unwrap();
           Swal.fire({
             title: 'Deleted!',
@@ -172,9 +173,11 @@ function UserDetails() {
           refetch();
         } catch (error) {
           console.error('Delete error:', error);
+          console.error('Error data:', error.data);
+          console.error('Error status:', error.status);
           Swal.fire({
             title: 'Error!',
-            text: error.data?.message || 'Failed to delete member',
+            text: error.data?.message || error.error || 'Failed to delete member',
             icon: 'error',
             confirmButtonColor: '#C9A961'
           });
