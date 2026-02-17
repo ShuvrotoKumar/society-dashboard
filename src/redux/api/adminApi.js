@@ -33,7 +33,14 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["admin"],
     }),
+    getSingleAdmin: builder.query({
+      query: () => ({
+        url: "/admin/me",
+        method: "GET",
+      }),
+      providesTags: ["admin"],
+    })
   }),
 });
 
-export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation } = adminApi;
+export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation , useGetSingleAdminQuery} = adminApi;

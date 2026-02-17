@@ -4,10 +4,18 @@ import { FaCamera } from "react-icons/fa";
 import EditProfile from "./EditProfile";
 import ChangePass from "./ChangePass";
 import { IoChevronBack } from "react-icons/io5";
+import { useGetSingleAdminQuery } from "../../redux/api/adminApi";
+import { getImageUrl } from "../../config/envConfig";
 
 function ProfilePage() {
   const [activeTab, setActiveTab] = useState("editProfile");
   const navigate = useNavigate();
+  const { data: adminData, isLoading, error } = useGetSingleAdminQuery();
+
+  if (isLoading) return <div>Loading Profile...</div>;
+  if (error) return <div>Error loading profile: {error.message}</div>;
+
+  const admin = adminData?.data?.admin;
 
   return (
     <div className="overflow-y-auto">
@@ -28,9 +36,13 @@ function ProfilePage() {
             <div className="relative">
               <div className="w-[122px] h-[122px] bg-[#C9A961] rounded-full border-4 border-white shadow-xl flex justify-center items-center">
                 <img
-                  src="https://avatar.iran.liara.run/public/44"
+                  src={admin?.avatar ? getImageUrl(admin.avatar) : "https://avatar.iran.liara.run/public/44"}
                   alt="profile"
                   className="h-30 w-32 rounded-full"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "https://avatar.iran.liara.run/public/44";
+                  }}
                 />
                 {/* Upload Icon */}
                 <div className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md cursor-pointer">
@@ -42,8 +54,8 @@ function ProfilePage() {
               </div>
             </div>
             <div className="text-center md:text-left">
-              <p className="text-lg sm:text-xl md:text-3xl font-bold">Shanto</p>
-              <p className="text-base sm:text-lg font-semibold">Admin</p>
+              <p className="text-lg sm:text-xl md:text-3xl font-bold">{admin?.fullname || "Admin Name"}</p>
+              <p className="text-base sm:text-lg font-semibold">{admin?.role || "Admin"}</p>
             </div>
           </div>
 

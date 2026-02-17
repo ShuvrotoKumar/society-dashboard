@@ -4,11 +4,16 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMenu, IoNotificationsOutline, IoClose } from "react-icons/io5";
 import Chat from "../../pages/Chat/Chat";
+import { useGetSingleAdminQuery } from "../../redux/api/adminApi";
+import { getImageUrl } from "../../config/envConfig";
 
 const MainHeader = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const [showChat, setShowChat] = useState(false);
   const chatRef = useRef(null);
+  const { data: adminData, isLoading, error } = useGetSingleAdminQuery();
+
+  const admin = adminData?.data?.admin;
 
   // Close chat when clicking outside
   useEffect(() => {
@@ -48,15 +53,19 @@ const MainHeader = ({ toggleSidebar }) => {
               className="flex items-center gap-2 cursor-default"
             >
               <img
-                src="https://avatar.iran.liara.run/public/31"
+                src={admin?.avatar ? getImageUrl(admin.avatar) : "https://avatar.iran.liara.run/public/31"}
                 className="w-8 md:w-12 h-8 md:h-12 object-cover rounded-full"
                 alt="User Avatar"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "https://avatar.iran.liara.run/public/31";
+                }}
               />
               <div>
                 <h3 className="hidden md:block text-[#C9A961] text-lg font-semibold">
-                  Mr. Admin
+                  {admin?.fullname || "Mr. Admin"}
                 </h3>
-                <p className="text-[#C9A961] text-lg font-semibold">Admin</p>
+                <p className="text-[#C9A961] text-lg font-semibold">{admin?.role || "Admin"}</p>
               </div>
             </div>
           </div>
