@@ -65,7 +65,7 @@ const MainHeader = ({ toggleSidebar }) => {
                 <h3 className="hidden md:block text-[#C9A961] text-lg font-semibold">
                   {admin?.fullname || "Mr. Admin"}
                 </h3>
-                <p className="text-[#C9A961] text-lg font-semibold">{admin?.role || "Admin"}</p>
+                <p className="text-[#C9A961] text-lg font-semibold">superadmin</p>
               </div>
             </div>
           </div>

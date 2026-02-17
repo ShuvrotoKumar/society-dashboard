@@ -101,7 +101,7 @@ function ProfilePage() {
             </div>
             <div className="text-center md:text-left">
               <p className="text-lg sm:text-xl md:text-3xl font-bold">{admin?.fullname || "Admin Name"}</p>
-              <p className="text-base sm:text-lg font-semibold">{admin?.role || "Admin"}</p>
+              <p className="text-base sm:text-lg font-semibold">superadmin</p>
             </div>
           </div>
 
