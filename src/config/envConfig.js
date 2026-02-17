@@ -5,7 +5,7 @@
 
 export const url = "https://society8807-backend.onrender.com/api/v1";
 export const pdfUrl = "https://society8807-backend.onrender.com";
-export const imageUrl = "https://society8807-backend.onrender.com/uploads";
+export const imageUrl = "https://society8807-backend.onrender.com/";
 
 export const getBaseUrl = () => {
   return url;

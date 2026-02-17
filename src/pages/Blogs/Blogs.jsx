@@ -5,6 +5,7 @@ import { FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 import { useGet_all_blogsQuery, useAdd_blogMutation, useUpdate_blogMutation, useDelete_blogMutation } from "../../redux/api/blogApi";
+import { getImageUrl } from "../../config/envConfig";
 
 const Blogs = () => {
   const navigate = useNavigate();
@@ -27,6 +28,17 @@ const Blogs = () => {
   const [deleteBlog] = useDelete_blogMutation();
   
   const blogs = blogsData?.data || [];
+  
+  // Debug: Log the blogs data
+  console.log('Blogs data:', blogsData);
+  console.log('Blogs array:', blogs);
+  
+  // Test getImageUrl function
+  if (blogs.length > 0) {
+    const testBlog = blogs[0];
+    console.log('Test blog coverImage:', testBlog.coverImage);
+    console.log('getImageUrl result:', getImageUrl(testBlog.coverImage));
+  }
 
   const columns = [
     {
@@ -39,19 +51,37 @@ const Blogs = () => {
       title: "Blog Title",
       dataIndex: "title",
       key: "title",
-      render: (value, record) => (
-        <div className="flex items-center gap-3">
-          <img
-            src={record.coverImage || 'https://picsum.photos/seed/default/300/200.jpg'}
-            className="w-12 h-12 object-cover rounded"
-            alt="Blog thumbnail"
-          />
-          <div>
-            <span className="font-medium leading-none">{value}</span>
-            <div className="text-xs text-gray-500 mt-1">{record.body?.substring(0, 50)}...</div>
+      render: (value, record) => {
+        const imageUrl = getImageUrl(record.coverImage);
+        console.log('Blog record:', record);
+        console.log('Cover image path:', record.coverImage);
+        console.log('Final image URL:', imageUrl);
+        
+        return (
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center overflow-hidden">
+              <img
+                src={imageUrl}
+                className="w-full h-full object-cover"
+                alt="Blog thumbnail"
+                onError={(e) => {
+                  console.error('Image failed to load:', imageUrl);
+                  e.target.onerror = null;
+                  e.target.style.display = 'none';
+                  e.target.parentElement.innerHTML = '<svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+                }}
+                onLoad={() => {
+                  console.log('Image loaded successfully:', imageUrl);
+                }}
+              />
+            </div>
+            <div>
+              <span className="font-medium leading-none">{value}</span>
+              <div className="text-xs text-gray-500 mt-1">{record.body?.substring(0, 50)}...</div>
+            </div>
           </div>
-        </div>
-      ),
+        );
+      },
     },
     {
       title: "Category",
@@ -150,8 +180,7 @@ const Blogs = () => {
     setFormData({
       title: blog.title,
       body: blog.body,
-      coverImage: blog.coverImage,
-      status: blog.status || 'Draft'
+      coverImage: blog.coverImage
     });
     setIsEditModalOpen(true);
   };
@@ -198,7 +227,14 @@ const Blogs = () => {
 
   const handleSaveEdit = async () => {
     try {
-      await updateBlog({ id: selectedBlog._id, ...formData }).unwrap();
+      const formDataToSend = new FormData();
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('body', formData.body);
+      if (formData.coverImage && typeof formData.coverImage !== 'string') {
+        formDataToSend.append('coverImage', formData.coverImage);
+      }
+      
+      await updateBlog({ id: selectedBlog._id, data: formDataToSend }).unwrap();
       Swal.fire({
         title: 'Updated!',
         text: 'Blog has been updated successfully.',
@@ -334,11 +370,31 @@ const Blogs = () => {
           {selectedBlog && (
             <div className="relative">
               <div className="bg-[#C9A961] p-6 -m-6 mb-6 rounded-t-lg">
-                <img
-                  src={selectedBlog.coverImage || 'https://picsum.photos/seed/default/300/200.jpg'}
-                  alt={selectedBlog.title}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
-                />
+                <div className="w-full h-48 bg-gray-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  {(() => {
+                    const modalImageUrl = getImageUrl(selectedBlog.coverImage);
+                    console.log('Modal selected blog:', selectedBlog);
+                    console.log('Modal cover image path:', selectedBlog.coverImage);
+                    console.log('Modal final image URL:', modalImageUrl);
+                    
+                    return (
+                      <img
+                        src={modalImageUrl}
+                        alt={selectedBlog.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Modal image failed to load:', modalImageUrl);
+                          e.target.onerror = null;
+                          e.target.style.display = 'none';
+                          e.target.parentElement.innerHTML = '<svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
+                        }}
+                        onLoad={() => {
+                          console.log('Modal image loaded successfully:', modalImageUrl);
+                        }}
+                      />
+                    );
+                  })()}
+                </div>
                 <h2 className="text-3xl font-bold text-white mb-2">
                   {selectedBlog.title}
                 </h2>
@@ -399,38 +455,25 @@ const Blogs = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-              <Input
-                value={formData.author}
-                onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
-                placeholder="Enter author name"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
+              <Input.TextArea
+                value={formData.body}
+                onChange={(e) => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                placeholder="Enter blog content"
+                rows={4}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <Select
-                value={formData.category}
-                onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                className="w-full"
-              >
-                <Select.Option value="Travel">Travel</Select.Option>
-                <Select.Option value="Food">Food</Select.Option>
-                <Select.Option value="History">History</Select.Option>
-                <Select.Option value="Entertainment">Entertainment</Select.Option>
-                <Select.Option value="Culture">Culture</Select.Option>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <Select
-                value={formData.status}
-                onChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                className="w-full"
-              >
-                <Select.Option value="Published">Published</Select.Option>
-                <Select.Option value="Draft">Draft</Select.Option>
-                <Select.Option value="Scheduled">Scheduled</Select.Option>
-              </Select>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData(prev => ({ ...prev, coverImage: e.target.files[0] }))}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#C9A961] file:text-white hover:file:bg-[#b89851]"
+              />
+              {formData.coverImage && (
+                <p className="mt-1 text-sm text-gray-600">Selected: {formData.coverImage.name}</p>
+              )}
             </div>
           </div>
         </Modal>
