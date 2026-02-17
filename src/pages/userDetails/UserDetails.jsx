@@ -5,11 +5,14 @@ import { MdBlock } from "react-icons/md";
 import { FiEdit2, FiEye, FiTrash } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
-import { useGetTeamUserQuery } from "../../redux/api/userApi";
+import { useGetTeamUserQuery, useCreateTeamUserMutation, useUpdateUserMutation, useDeleteUserMutation } from "../../redux/api/userApi";
 
 function UserDetails() {
   const navigate = useNavigate();
-  const { data: teamData, isLoading, error } = useGetTeamUserQuery();
+  const { data: teamData, isLoading, refetch } = useGetTeamUserQuery();
+  const [createTeamUser, { isLoading: isCreating }] = useCreateTeamUserMutation();
+  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -17,12 +20,12 @@ function UserDetails() {
   const [roleFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
-    fullName: '',
-    role: 'User',
-    clinic: '',
+    name: '',
+    designation: '',
     email: '',
     phone: '',
-    joined: new Date().toISOString().split('T')[0]
+    bio: '',
+    keyword: []
   });
 
   // Transform API data to match table structure
@@ -53,12 +56,12 @@ function UserDetails() {
 
   const showAddModal = () => {
     setFormData({
-      fullName: '',
-      role: 'User',
-      clinic: '',
+      name: '',
+      designation: '',
       email: '',
       phone: '',
-      joined: new Date().toISOString().split('T')[0]
+      bio: '',
+      keyword: []
     });
     setIsAddModalOpen(true);
   };
@@ -66,37 +69,61 @@ function UserDetails() {
   const showEditModal = (user) => {
     setSelectedUser(user);
     setFormData({
-      fullName: user.fullName,
-      role: user.role,
-      clinic: user.clinic,
+      name: user.fullName,
+      designation: user.role,
       email: user.email,
       phone: user.phone,
-      joined: user.joined
+      bio: user.bio || '',
+      keyword: user.keyword || []
     });
     setIsEditModalOpen(true);
   };
 
-  const handleAddMember = () => {
-    const newMember = {
-      key: String(dataSource.length + 1),
-      ...formData
-    };
-    dataSource.push(newMember);
-    setIsAddModalOpen(false);
-    Swal.fire({
-      title: 'Added!',
-      text: 'New member has been added successfully.',
-      icon: 'success',
-      confirmButtonColor: '#C9A961',
-      timer: 2000,
-      timerProgressBar: true
-    });
+  const handleAddMember = async () => {
+    try {
+      const requestData = {
+        name: formData.name,
+        designation: formData.designation,
+        email: formData.email,
+        phone: formData.phone,
+        bio: formData.bio,
+        keyword: formData.keyword
+      };
+      
+      await createTeamUser(requestData).unwrap();
+      setIsAddModalOpen(false);
+      Swal.fire({
+        title: 'Added!',
+        text: 'New member has been added successfully.',
+        icon: 'success',
+        confirmButtonColor: '#C9A961',
+        timer: 2000,
+        timerProgressBar: true
+      });
+      refetch();
+    } catch (error) {
+      console.error('Add error:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: error.data?.message || 'Failed to add member',
+        icon: 'error',
+        confirmButtonColor: '#C9A961'
+      });
+    }
   };
 
-  const handleEditMember = () => {
-    const index = dataSource.findIndex(user => user.key === selectedUser.key);
-    if (index !== -1) {
-      dataSource[index] = { ...dataSource[index], ...formData };
+  const handleEditMember = async () => {
+    try {
+      const requestData = {
+        name: formData.name,
+        designation: formData.designation,
+        email: formData.email,
+        phone: formData.phone,
+        bio: formData.bio,
+        keyword: formData.keyword
+      };
+      
+      await updateUser({ userId: selectedUser.key, ...requestData }).unwrap();
       setIsEditModalOpen(false);
       setSelectedUser(null);
       Swal.fire({
@@ -107,10 +134,19 @@ function UserDetails() {
         timer: 2000,
         timerProgressBar: true
       });
+      refetch();
+    } catch (error) {
+      console.error('Update error:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: error.data?.message || 'Failed to update member',
+        icon: 'error',
+        confirmButtonColor: '#C9A961'
+      });
     }
   };
 
-  const handleDeleteMember = (user) => {
+  const handleDeleteMember = async (user) => {
     Swal.fire({
       title: 'Delete Member?',
       html: `Are you sure you want to delete <strong>${user.fullName}</strong>?`,
@@ -121,20 +157,28 @@ function UserDetails() {
       confirmButtonText: 'Delete',
       cancelButtonText: 'Cancel',
       reverseButtons: true
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        const index = dataSource.findIndex(u => u.key === user.key);
-        if (index !== -1) {
-          dataSource.splice(index, 1);
+        try {
+          await deleteUser(user.key).unwrap();
+          Swal.fire({
+            title: 'Deleted!',
+            text: `${user.fullName} has been deleted.`,
+            icon: 'success',
+            confirmButtonColor: '#C9A961',
+            timer: 2000,
+            timerProgressBar: true
+          });
+          refetch();
+        } catch (error) {
+          console.error('Delete error:', error);
+          Swal.fire({
+            title: 'Error!',
+            text: error.data?.message || 'Failed to delete member',
+            icon: 'error',
+            confirmButtonColor: '#C9A961'
+          });
         }
-        Swal.fire({
-          title: 'Deleted!',
-          text: `${user.fullName} has been deleted.`,
-          icon: 'success',
-          confirmButtonColor: '#C9A961',
-          timer: 2000,
-          timerProgressBar: true
-        });
       }
     });
   };
@@ -395,6 +439,7 @@ function UserDetails() {
               key="save" 
               type="primary" 
               onClick={handleAddMember}
+              loading={isCreating}
               style={{ backgroundColor: "#C9A961", borderColor: "#C9A961" }}
             >
               Add Member
@@ -405,28 +450,17 @@ function UserDetails() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
               <Input
-                value={formData.fullName}
-                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Enter full name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-              <Select
-                value={formData.role}
-                onChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
-                className="w-full"
-              >
-                <Select.Option value="User">User</Select.Option>
-                <Select.Option value="Vendor">Vendor</Select.Option>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Clinic</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
               <Input
-                value={formData.clinic}
-                onChange={(e) => setFormData(prev => ({ ...prev, clinic: e.target.value }))}
-                placeholder="Enter clinic name"
+                value={formData.designation}
+                onChange={(e) => setFormData(prev => ({ ...prev, designation: e.target.value }))}
+                placeholder="Enter designation"
               />
             </div>
             <div>
@@ -446,11 +480,12 @@ function UserDetails() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Joined Date</label>
-              <Input
-                type="date"
-                value={formData.joined}
-                onChange={(e) => setFormData(prev => ({ ...prev, joined: e.target.value }))}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <Input.TextArea
+                value={formData.bio}
+                onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                placeholder="Enter bio"
+                rows={3}
               />
             </div>
           </div>
@@ -469,6 +504,7 @@ function UserDetails() {
               key="save" 
               type="primary" 
               onClick={handleEditMember}
+              loading={isUpdating}
               style={{ backgroundColor: "#C9A961", borderColor: "#C9A961" }}
             >
               Save Changes
@@ -479,28 +515,17 @@ function UserDetails() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
               <Input
-                value={formData.fullName}
-                onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Enter full name"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-              <Select
-                value={formData.role}
-                onChange={(value) => setFormData(prev => ({ ...prev, role: value }))}
-                className="w-full"
-              >
-                <Select.Option value="User">User</Select.Option>
-                <Select.Option value="Vendor">Vendor</Select.Option>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Clinic</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Designation</label>
               <Input
-                value={formData.clinic}
-                onChange={(e) => setFormData(prev => ({ ...prev, clinic: e.target.value }))}
-                placeholder="Enter clinic name"
+                value={formData.designation}
+                onChange={(e) => setFormData(prev => ({ ...prev, designation: e.target.value }))}
+                placeholder="Enter designation"
               />
             </div>
             <div>
@@ -520,11 +545,12 @@ function UserDetails() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Joined Date</label>
-              <Input
-                type="date"
-                value={formData.joined}
-                onChange={(e) => setFormData(prev => ({ ...prev, joined: e.target.value }))}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <Input.TextArea
+                value={formData.bio}
+                onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                placeholder="Enter bio"
+                rows={3}
               />
             </div>
           </div>

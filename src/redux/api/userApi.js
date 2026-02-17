@@ -12,28 +12,29 @@ export const userApi = baseApi.injectEndpoints({
       }),
       providesTags: ["user"],
     }),
-    getSingleUser: builder.query({
-      query: ({ userId }) => ({
-        url: "dashboard/users-business-statistics",
-        method: "GET",
-        params: {
-          userId,
-        },
-      }),
-      providesTags: ["user"],
+    createTeamUser:builder.mutation({
+      query: (data) => {
+        return {
+          url: `/team-members`,
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["user"],
     }),
     updateUser: builder.mutation({
-      query: (userId) => {
+      query: ({ userId, ...data }) => {
         return {
-          url: `dashboard/block-user?userId=${userId}`,
+          url: `/team-members/${userId}`,
           method: "PATCH",
+          body: data,
         };
       },
       invalidatesTags: ["user"],
     }),
     deleteUser: builder.mutation({
       query: (userId) => ({
-        url: `dashboard/delete-user/${userId}`,
+        url: `/team-members/${userId}`,
         method: "DELETE",
       }),
       invalidatesTags: ["user"],
@@ -44,7 +45,7 @@ export const userApi = baseApi.injectEndpoints({
 
 export const {
   useGetTeamUserQuery,
-  useGetSingleUserQuery,
+  useCreateTeamUserMutation,
   useUpdateUserMutation,
   useDeleteUserMutation,
 } = userApi;
