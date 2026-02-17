@@ -4,18 +4,58 @@ import { FaCamera } from "react-icons/fa";
 import EditProfile from "./EditProfile";
 import ChangePass from "./ChangePass";
 import { IoChevronBack } from "react-icons/io5";
-import { useGetSingleAdminQuery } from "../../redux/api/adminApi";
+import { useGetSingleAdminQuery, useUpdateAdminAvatarMutation } from "../../redux/api/adminApi";
 import { getImageUrl } from "../../config/envConfig";
+import Swal from 'sweetalert2';
 
 function ProfilePage() {
   const [activeTab, setActiveTab] = useState("editProfile");
   const navigate = useNavigate();
-  const { data: adminData, isLoading, error } = useGetSingleAdminQuery();
+  const { data: adminData, isLoading, error, refetch } = useGetSingleAdminQuery();
+  const [updateAdminAvatar] = useUpdateAdminAvatarMutation();
 
   if (isLoading) return <div>Loading Profile...</div>;
   if (error) return <div>Error loading profile: {error.message}</div>;
 
   const admin = adminData?.data?.admin;
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      Swal.fire('Error!', 'Please select an image file', 'error');
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      Swal.fire('Error!', 'Image size should be less than 5MB', 'error');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      await updateAdminAvatar({ requestData: formData }).unwrap();
+      Swal.fire({
+        title: 'Success!',
+        text: 'Profile picture updated successfully',
+        icon: 'success',
+        confirmButtonColor: '#C9A961',
+        timer: 2000,
+        timerProgressBar: true
+      });
+      refetch(); // Refresh admin data to show new avatar
+    } catch (error) {
+      Swal.fire('Error!', 'Failed to update profile picture', 'error');
+    }
+
+    // Reset file input
+    e.target.value = '';
+  };
 
   return (
     <div className="overflow-y-auto">
@@ -49,7 +89,13 @@ function ProfilePage() {
                   <label htmlFor="profilePicUpload" className="cursor-pointer">
                     <FaCamera className="text-[#575757]" />
                   </label>
-                  <input type="file" id="profilePicUpload" className="hidden" />
+                  <input 
+                    type="file" 
+                    id="profilePicUpload" 
+                    className="hidden" 
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                  />
                 </div>
               </div>
             </div>

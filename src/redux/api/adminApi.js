@@ -39,8 +39,16 @@ const adminApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["admin"],
-    })
+    }),
+    updateAdminAvatar: builder.mutation({
+      query: ({ requestData }) => ({
+        url: `/admin/update-avatar`,
+        method: "PATCH",
+        body: requestData,
+      }),
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
-export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation , useGetSingleAdminQuery} = adminApi;
+export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation , useGetSingleAdminQuery, useUpdateAdminAvatarMutation} = adminApi;
