@@ -56,7 +56,15 @@ const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["admin"],
     }),
+    changeAdminPassword: builder.mutation({
+      query: (data) => ({
+        url: `/admin/change-password`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["admin"],
+    }),
   }),
 });
 
-export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation , useGetSingleAdminQuery, useUpdateAdminAvatarMutation, useUpdateAdminProfileMutation} = adminApi;
+export const { useGetAdminQuery, useCreateAdminMutation, useUpdateAdminMutation, useDeleteAdminMutation , useGetSingleAdminQuery, useUpdateAdminAvatarMutation, useUpdateAdminProfileMutation, useChangeAdminPasswordMutation} = adminApi;

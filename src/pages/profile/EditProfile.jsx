@@ -9,7 +9,7 @@ function EditProfile() {
   const [formData, setFormData] = useState({
     fullname: "",
     email: "",
-    contactNo: "",
+    mobile: "",
   });
 
   useEffect(() => {
@@ -17,7 +17,7 @@ function EditProfile() {
       setFormData({
         fullname: adminData.data.admin.fullname || "",
         email: adminData.data.admin.email || "",
-        contactNo: adminData.data.admin.contactNo || "",
+        mobile: adminData.data.admin.mobile || "",
       });
     }
   }, [adminData]);
@@ -74,23 +74,23 @@ function EditProfile() {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none placeholder:text-sm md:placeholder:text-base focus:ring-2 focus:ring-[#74AA2E]"
+              className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none placeholder:text-sm md:placeholder:text-base focus:ring-2 focus:ring-[#74AA2E] bg-gray-100 cursor-not-allowed"
               placeholder="Enter email"
-              required
+              disabled
             />
           </div>
 
           <div>
             <label className="text-sm md:text-base text-[#0D0D0D] mb-2 font-semibold block">
-              Contact Number
+              Mobile
             </label>
             <input
               type="text"
-              name="contactNo"
-              value={formData.contactNo}
+              name="mobile"
+              value={formData.mobile}
               onChange={handleChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-md outline-none placeholder:text-sm md:placeholder:text-base focus:ring-2 focus:ring-[#74AA2E]"
-              placeholder="Enter contact number"
+              placeholder="Enter mobile number"
               required
             />
           </div>
