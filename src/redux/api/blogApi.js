@@ -20,10 +20,10 @@ export const blogApi = createApi({
       providesTags: ["blog"],
     }),
     add_blog: builder.mutation({
-      query: (data) => ({
+      query: (formData) => ({
         url: "/blogs",
         method: "POST",
-        body: data,
+        body: formData,
       }),
       invalidatesTags: ["blog"],
     }),

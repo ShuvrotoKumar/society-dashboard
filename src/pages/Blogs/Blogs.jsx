@@ -17,8 +17,7 @@ const Blogs = () => {
   const [formData, setFormData] = useState({
     title: '',
     body: '',
-    coverImage: null,
-    status: 'Published'
+    coverImage: null
   });
 
   // API hooks
@@ -192,8 +191,7 @@ const Blogs = () => {
     setFormData({
       title: '',
       body: '',
-      coverImage: null,
-      status: 'Draft'
+      coverImage: null
     });
     setIsAddModalOpen(true);
   };
@@ -466,38 +464,25 @@ const Blogs = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-              <Input
-                value={formData.author}
-                onChange={(e) => setFormData(prev => ({ ...prev, author: e.target.value }))}
-                placeholder="Enter author name"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Body</label>
+              <Input.TextArea
+                value={formData.body}
+                onChange={(e) => setFormData(prev => ({ ...prev, body: e.target.value }))}
+                placeholder="Enter blog content"
+                rows={4}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-              <Select
-                value={formData.category}
-                onChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                className="w-full"
-              >
-                <Select.Option value="Travel">Travel</Select.Option>
-                <Select.Option value="Food">Food</Select.Option>
-                <Select.Option value="History">History</Select.Option>
-                <Select.Option value="Entertainment">Entertainment</Select.Option>
-                <Select.Option value="Culture">Culture</Select.Option>
-              </Select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <Select
-                value={formData.status}
-                onChange={(value) => setFormData(prev => ({ ...prev, status: value }))}
-                className="w-full"
-              >
-                <Select.Option value="Published">Published</Select.Option>
-                <Select.Option value="Draft">Draft</Select.Option>
-                <Select.Option value="Scheduled">Scheduled</Select.Option>
-              </Select>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setFormData(prev => ({ ...prev, coverImage: e.target.files[0] }))}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#C9A961] file:text-white hover:file:bg-[#b89851]"
+              />
+              {formData.coverImage && (
+                <p className="mt-1 text-sm text-gray-600">Selected: {formData.coverImage.name}</p>
+              )}
             </div>
           </div>
         </Modal>
