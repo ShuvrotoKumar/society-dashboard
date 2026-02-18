@@ -81,7 +81,7 @@ function ProfilePage() {
                 <img
                   src={avatarSrc}
                   alt="profile"
-                  className="h-30 w-32 rounded-full"
+                  className="w-full h-full object-cover rounded-full"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = "https://avatar.iran.liara.run/public/44";

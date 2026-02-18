@@ -25,10 +25,10 @@ function DashboardPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {[
-          { value: '200K', label: 'Total User' },
+          { value: '200K', label: 'Total Members' },
           // { value: '1200', label: 'Venue Listed' },
           // { value: '1200', label: 'Venue Booked' },
-          { value: '$120K', label: 'Total Revenue' }
+          { value: '$120K', label: 'Total Blogs' }
         ].map((stat, index, array) => (
           <div 
             key={stat.label}

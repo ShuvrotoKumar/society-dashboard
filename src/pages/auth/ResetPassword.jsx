@@ -17,6 +17,16 @@ function ResetPassword() {
       alert("Passwords do not match");
       return;
     }
+
+    const resetToken = localStorage.getItem("resetToken");
+    if (!resetToken) {
+      alert("Reset token is missing. Please request a new OTP.");
+      navigate("/forget-password");
+      return;
+    }
+
+    console.log("Submitting reset with token:", resetToken.substring(0, 20) + "...");
+
     try {
       const response = await resetPassword({
         newPassword,
@@ -24,11 +34,17 @@ function ResetPassword() {
       }).unwrap();
       if (response.success) {
         localStorage.removeItem("resetToken");
+        localStorage.removeItem("resetEmail");
         navigate("/sign-in");
       }
     } catch (error) {
       console.error("Reset password failed:", error);
-      alert(error?.data?.message || "Failed to reset password");
+      const message = error?.data?.message || "Failed to reset password";
+      alert(message);
+      if (message.includes("expired") || message.includes("Invalid")) {
+        localStorage.removeItem("resetToken");
+        navigate("/forget-password");
+      }
     }
   };
 
