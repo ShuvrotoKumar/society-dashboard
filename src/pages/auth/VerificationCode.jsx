@@ -38,10 +38,18 @@ function VerificationCode() {
 
     try {
       const res = await verifyEmail({ email, otp }).unwrap();
+      console.log("Verify OTP Response:", res);
 
-      const token = res?.data?.token || res?.token || res?.data?.resetToken || res?.resetToken;
+      const token = res?.data?.token || res?.data?.resetToken || res?.token || res?.resetToken;
+      console.log("Extracted token:", token);
+
       if (token) {
         localStorage.setItem("resetToken", token);
+        console.log("Token stored in localStorage");
+      } else {
+        console.error("No token found in response", res);
+        Swal.fire("Error!", "Failed to get reset token. Please try again.", "error");
+        return;
       }
 
       Swal.fire({
