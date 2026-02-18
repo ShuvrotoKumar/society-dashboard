@@ -3,9 +3,9 @@
 // export const pdfUrl = "http://10.10.20.57:8001";
 // export const imageUrl = "http://10.10.20.57:8001/uploads";
 
-export const url = "https://society8807-backend.onrender.com/api/v1";
-export const pdfUrl = "https://society8807-backend.onrender.com";
-export const imageUrl = "https://society8807-backend.onrender.com/";
+export const url = "https://ctrl-asked-packard-fork.trycloudflare.com/api/v1";
+export const pdfUrl = "https://ctrl-asked-packard-fork.trycloudflare.com";
+export const imageUrl = "https://ctrl-asked-packard-fork.trycloudflare.com";
 
 export const getBaseUrl = () => {
   return url;

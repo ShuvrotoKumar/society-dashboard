@@ -1,10 +1,36 @@
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import { useResetPasswordMutation } from "../../redux/api/authApi";
 
 function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    try {
+      const response = await resetPassword({
+        newPassword,
+        confirmPassword,
+      }).unwrap();
+      if (response.success) {
+        localStorage.removeItem("resetToken");
+        navigate("/sign-in");
+      }
+    } catch (error) {
+      console.error("Reset password failed:", error);
+      alert(error?.data?.message || "Failed to reset password");
+    }
+  };
 
   return (
     <div className="bg-white min-h-screen flex items-center justify-center p-5">
@@ -14,7 +40,7 @@ function ResetPassword() {
             <div className="flex justify-center items-center mb-10">
               <img src="/logo.png" alt="" />
             </div>
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="w-full">
                 <label className="text-xl text-[#C9A961] mb-2 font-bold">
                   New Password
@@ -22,10 +48,12 @@ function ResetPassword() {
                 <div className="w-full relative">
                   <input
                     type={showPassword ? "text" : "password"}
-                    name="password"
+                    name="newPassword"
                     placeholder="**********"
                     className="w-full px-5 py-3 border-2 border-[#6A6D76] rounded-md outline-none mt-5 placeholder:text-xl"
                     required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                   />
                   <button
                     type="button"
@@ -46,18 +74,20 @@ function ResetPassword() {
                 </label>
                 <div className="w-full relative">
                   <input
-                    type={showPassword ? "text" : "password"}
-                    name="password"
+                    type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
                     placeholder="**********"
                     className="w-full px-5 py-3 border-2 border-[#6A6D76] rounded-md outline-none mt-5 placeholder:text-xl"
                     required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 bottom-4 flex items-center text-[#6A6D76]"
                   >
-                    {showPassword ? (
+                    {showConfirmPassword ? (
                       <IoEyeOffOutline className="w-5 h-5" />
                     ) : (
                       <IoEyeOutline className="w-5 h-5" />
@@ -67,11 +97,11 @@ function ResetPassword() {
               </div>
               <div className="flex justify-center items-center">
                 <button
-                  onClick={() => navigate("/sign-in")}
-                  type="button"
-                  className="w-1/3 bg-[#C9A961] text-white font-bold py-3 rounded-lg shadow-lg cursor-pointer mt-5"
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-1/3 bg-[#C9A961] text-white font-bold py-3 rounded-lg shadow-lg cursor-pointer mt-5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Update Password
+                  {isLoading ? "Updating..." : "Update Password"}
                 </button>
               </div>
             </form>

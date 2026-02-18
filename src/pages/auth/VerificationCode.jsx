@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { useVerifyEmailMutation } from "../../redux/api/authApi";
 
 function VerificationCode() {
-  const [code, setCode] = useState(new Array(5).fill(""));
+  const [code, setCode] = useState(new Array(6).fill(""));
 
   const navigate = useNavigate();
+  const [verifyEmail, { isLoading }] = useVerifyEmailMutation();
 
   const handleChange = (value, index) => {
     if (!isNaN(value)) {
@@ -12,14 +15,48 @@ function VerificationCode() {
       newCode[index] = value;
       setCode(newCode);
 
-      if (value && index < 5) {
-        document.getElementById(`code-${index + 1}`).focus();
+      if (value && index < newCode.length - 1) {
+        document.getElementById(`code-${index + 1}`)?.focus();
       }
     }
   };
 
   const handleVerifyCode = async () => {
-    navigate(`/new-password`);
+    const otp = code.join("");
+    const email = localStorage.getItem("resetEmail");
+
+    if (!email) {
+      Swal.fire("Error!", "Email not found. Please request OTP again.", "error");
+      navigate("/forget-password");
+      return;
+    }
+
+    if (code.some((d) => d === "") || otp.length !== 6) {
+      Swal.fire("Error!", "Please enter the 6-digit code.", "error");
+      return;
+    }
+
+    try {
+      const res = await verifyEmail({ email, otp }).unwrap();
+
+      const token = res?.data?.token || res?.token || res?.data?.resetToken || res?.resetToken;
+      if (token) {
+        localStorage.setItem("resetToken", token);
+      }
+
+      Swal.fire({
+        title: "Success!",
+        text: res?.message || "OTP verified successfully",
+        icon: "success",
+        confirmButtonColor: "#C9A961",
+        timer: 2000,
+        timerProgressBar: true,
+      });
+
+      navigate("/new-password");
+    } catch (error) {
+      Swal.fire("Error!", error?.data?.message || "Invalid OTP", "error");
+    }
   };
 
   return (
@@ -50,9 +87,10 @@ function VerificationCode() {
               <button
                 onClick={handleVerifyCode}
                 type="button"
+                disabled={isLoading}
                 className="w-1/3 bg-[#C9A961] text-white font-bold py-3 rounded-lg shadow-lg cursor-pointer mt-5"
               >
-                Verify Code
+                {isLoading ? "Verifying..." : "Verify Code"}
               </button>
             </div>
             <p className="text-[#C9A961] text-center mb-10">
