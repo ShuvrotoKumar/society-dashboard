@@ -18,6 +18,9 @@ function ProfilePage() {
   if (error) return <div>Error loading profile: {error.message}</div>;
 
   const admin = adminData?.data?.admin;
+  const avatarSrc = admin?.avatar
+    ? `${getImageUrl(admin.avatar)}?v=${encodeURIComponent(admin?.updatedAt || admin?._id || "")}`
+    : "https://avatar.iran.liara.run/public/44";
 
   const handleAvatarUpload = async (e) => {
     const file = e.target.files[0];
@@ -76,7 +79,7 @@ function ProfilePage() {
             <div className="relative">
               <div className="w-[122px] h-[122px] bg-[#C9A961] rounded-full border-4 border-white shadow-xl flex justify-center items-center">
                 <img
-                  src={admin?.avatar ? getImageUrl(admin.avatar) : "https://avatar.iran.liara.run/public/44"}
+                  src={avatarSrc}
                   alt="profile"
                   className="h-30 w-32 rounded-full"
                   onError={(e) => {
@@ -101,7 +104,7 @@ function ProfilePage() {
             </div>
             <div className="text-center md:text-left">
               <p className="text-lg sm:text-xl md:text-3xl font-bold">{admin?.fullname || "Admin Name"}</p>
-              <p className="text-base sm:text-lg font-semibold">superadmin</p>
+              <p className="text-base sm:text-lg font-semibold">{admin?.role || ""}</p>
             </div>
           </div>
 

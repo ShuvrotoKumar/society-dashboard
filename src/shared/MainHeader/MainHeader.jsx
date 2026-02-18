@@ -14,6 +14,9 @@ const MainHeader = ({ toggleSidebar }) => {
   const { data: adminData, isLoading, error } = useGetSingleAdminQuery();
 
   const admin = adminData?.data?.admin;
+  const avatarSrc = admin?.avatar
+    ? `${getImageUrl(admin.avatar)}?v=${encodeURIComponent(admin?.updatedAt || admin?._id || "")}`
+    : "https://avatar.iran.liara.run/public/31";
 
   // Close chat when clicking outside
   useEffect(() => {
@@ -32,7 +35,6 @@ const MainHeader = ({ toggleSidebar }) => {
     };
   }, []);
 
-
   return (
     <div className="relative w-full px-5">
       <header className="shadow-sm rounded-lg border border-[#E5E7EB] overflow-hidden">
@@ -45,7 +47,7 @@ const MainHeader = ({ toggleSidebar }) => {
             <IoMenu className="w-8 h-8 text-[#C9A961]" />
           </button>
           <div className="flex items-center gap-3">
-            
+
 
             {/* Profile */}
             <div
@@ -53,7 +55,7 @@ const MainHeader = ({ toggleSidebar }) => {
               className="flex items-center gap-2 cursor-default"
             >
               <img
-                src={admin?.avatar ? getImageUrl(admin.avatar) : "https://avatar.iran.liara.run/public/31"}
+                src={avatarSrc}
                 className="w-8 md:w-12 h-8 md:h-12 object-cover rounded-full"
                 alt="User Avatar"
                 onError={(e) => {
@@ -65,7 +67,7 @@ const MainHeader = ({ toggleSidebar }) => {
                 <h3 className="hidden md:block text-[#C9A961] text-lg font-semibold">
                   {admin?.fullname || "Mr. Admin"}
                 </h3>
-                <p className="text-[#C9A961] text-lg font-semibold">superadmin</p>
+                <p className="text-[#C9A961] text-lg font-semibold">{admin?.role || ""}</p>
               </div>
             </div>
           </div>
