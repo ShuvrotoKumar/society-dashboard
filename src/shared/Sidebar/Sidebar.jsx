@@ -47,7 +47,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       {/* Sidebar Menu */}
       <ul className="mt-10 px-5 text-[10px]">
         {/* Dashboard Page */}
-        <Link to="/" onClick={handleLinkClick}>
+        {/* <Link to="/" onClick={handleLinkClick}>
           <li
             className={`flex items-center gap-2 cursor-pointer transition-all duration-300 ease-in-out ${
               isActive("/")
@@ -58,7 +58,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <RxDashboard className="w-5 h-5" />
             <p className="text-lg font-semibold">Dashboard</p>
           </li>
-        </Link>
+        </Link> */}
         {/* User Management */}
         <Link to="/user-details" onClick={handleLinkClick}>
           <li

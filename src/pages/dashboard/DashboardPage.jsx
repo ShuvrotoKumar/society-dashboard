@@ -84,7 +84,7 @@ function DashboardPage() {
       </div>
       {/* Recent Users Section */}
       <div className="w-full">
-        <h1 className="text-xl md:text-2xl text-[#C9A961] font-bold mb-4">Recent Joined Users</h1>
+        <h1 className="text-xl md:text-2xl text-[#C9A961] font-bold mb-4">Recent Joined Members</h1>
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <RecentUsers />
         </div>
