@@ -49,7 +49,7 @@ function SignInPage() {
       }
 
       dispatch(setUser({ user: user || null, token: accessToken || null }));
-      navigate("/");
+      navigate("/user-details");
     } catch (error) {
       console.error("Login failed:", error);
     }
